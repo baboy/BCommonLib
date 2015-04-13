@@ -46,6 +46,9 @@ Pod::Spec.new do |s|
 		dao.resource = 'BCommonLib/Classes/common/dao/db.plist'
     	dao.source_files = 'BCommonLib/Classes/common/dao'
     end 
+    common.subspec 'controller' do |controller|
+    	controller.source_files = 'BCommonLib/Classes/common/controller'
+    end 
     common.subspec 'ext' do |ext|
     	ext.source_files = 'BCommonLib/Classes/common/ext'
     end
