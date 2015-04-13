@@ -1,0 +1,78 @@
+Pod::Spec.new do |s|
+  s.name         = "BCommonLib"
+  s.version      = "0.1"
+  s.summary      = "for baboy use."
+  s.homepage     = "http://github.com/baboy/BCommonLib"
+  s.author       = { "baboy" => "baboyzyh@gmail.com" }
+  s.source       = { :git => "https://github.com/baboy/BCommonLib.git", :tag => "0.1" }
+  s.platform     = :ios
+
+  s.source_files = 'BCommon/Classes/*.{h,m}'
+
+
+  s.subspec 'app' do |app|    
+	app.resource = 'BCommon/Classes/app/default.api.plist', 'BCommon/Classes/app/default.conf.plist'
+    app.source_files = 'BCommon/Classes/app'
+  end
+  s.subspec 'modules' do |mod|
+	mod.source_files = 'BCommon/Classes/modules'
+	mod.subspec 'AFNetworking' do |af|
+		af.source_files = 'BCommon/Classes/modules/AFNetworking'
+	end
+	mod.subspec 'share' do |share|
+		share.source_files = 'BCommon/Classes/modules/share'
+	end
+	mod.subspec 'sliding menu' do |sld|
+		sld.source_files = 'BCommon/Classes/modules/sliding menu'
+	end
+	mod.subspec 'tracker' do |tracker|
+		tracker.source_files = 'BCommon/Classes/modules/tracker'
+	end
+  end
+  s.subspec 'model' do |model|
+	model.source_files = 'BCommon/Classes/model'
+	model.subspec 'member' do |member|
+		member.source_files = 'BCommon/Classes/model/member'
+	end
+	model.subspec 'app' do |app|
+		app.source_files = 'BCommon/Classes/model/app'
+	end
+  end
+  s.subspec 'common' do |common|     
+    common.subspec 'categories' do |cate|
+    	cate.source_files = 'BCommon/Classes/common/categories'
+    end 
+    common.subspec 'dao' do |dao|
+		dao.resource = 'BCommon/Classes/common/dao/db.plist'
+    	dao.source_files = 'BCommon/Classes/common/dao'
+    end 
+    common.subspec 'ext' do |ext|
+    	ext.source_files = 'BCommon/Classes/common/ext'
+    end
+    common.subspec 'map' do |map|
+    	map.source_files = 'BCommon/Classes/common/map'
+    end
+    common.subspec 'network' do |network|
+    	network.source_files = 'BCommon/Classes/common/network'
+    end
+    common.subspec 'ui' do |ui|
+    	ui.source_files = 'BCommon/Classes/common/ui'
+    end
+    common.subspec 'utils' do |utils|
+    	utils.source_files = 'BCommon/Classes/common/utils'
+    end
+	common.subspec 'theme' do |theme|
+		theme.resource = 'BCommon/Classes/common/theme/default.string.plist', 'BCommon/Classes/common/theme/default.theme.plist'
+		theme.source_files = 'BCommon/Classes/common/theme'
+	end
+    common.subspec 'web' do |web|
+    	web.source_files = 'BCommon/Classes/common/web'
+		web.prefix_header_file = "BCommon/BCommon-Prefix.pch"
+    end
+  end
+
+  s.frameworks = 'UIKit', 'QuartzCore', 'CFNetwork', 'AVFoundation', 'CoreFoundation', 'CoreGraphics', 'Security', 'AudioToolbox', 'MediaPlayer', 'MobileCoreServices', 'SystemConfiguration', 'CoreMedia', 'Mapkit', 'CoreLocation', 'MessageUI', 'ImageIO'
+
+  s.libraries   = 'sqlite3.0', 'xml2', 'icucore', 'z'
+
+end
