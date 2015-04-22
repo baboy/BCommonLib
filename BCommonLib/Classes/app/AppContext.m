@@ -11,10 +11,16 @@
 
 @implementation AppContext
 
-+ (BOOL) ns:(NSString *)ns{
++ (BOOL) setNs:(NSString *)ns{
     return [DBCache setValue:ns forKey:@"app_namespace"];
 }
 + (NSString *)ns{
     return [DBCache valueForKey:@"app_namespace"];
+}
++ (void) setDeviceToken:(NSString *)deviceToken{
+    [DBCache setValue:deviceToken forKey:@"device_token"];
+}
++ (NSString *) deviceToken{
+    return [DBCache valueForKey:@"device_token"];
 }
 @end

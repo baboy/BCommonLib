@@ -8,7 +8,6 @@
 
 #ifndef BCommonLib_BCommonLibBase_h
 #define BCommonLib_BCommonLibBase_h
-#import "AppBaseDelegate.h"
 #import "BaseTableViewController.h"
 #import "BaseViewController.h"
 #import "AppBaseDelegate.h"

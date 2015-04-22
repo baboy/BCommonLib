@@ -175,7 +175,7 @@
     CGRect imgFrame = CGRectMake(0, titleView.bounds.size.height/2-iconWidth/2, iconWidth, iconWidth);
     XUIImageView *thumbImageView = [[XUIImageView alloc] initWithFrame:imgFrame];
     thumbImageView.contentMode = UIViewContentModeScaleAspectFit;
-    [thumbImageView setImageURL:imageURL];
+    [thumbImageView setImageURLString:imageURL];
     
     [titleView addSubview:thumbImageView];
     thumbImageView = nil;

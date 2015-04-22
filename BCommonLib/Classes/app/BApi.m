@@ -8,6 +8,7 @@
 
 #import "BApi.h"
 #import "Utils.h"
+#import "Global.h"
 #import "BCommonLibDao.h"
 #import "BCommonLibCategories.h"
 
@@ -45,9 +46,19 @@
     [self setup:@"default"];
 }
 
++ (BOOL)setCommonParams:(NSDictionary *)params{
+    [G setValue:params forKey:@"api_common_params"];
+    return true;
+}
++ (NSDictionary *)commonParams{
+    NSDictionary *d = [G valueForKey:@"api_common_params"];
+    return d;
+}
+
 + (NSString *)apiForKey:(NSString *)key{
 	NSString *v = [DBCache valueForKey:key domain:@"api"];
-	return v;
+    NSString *url = [v URLStringWithParam:[self commonParams]];
+	return url;
 }
 + (NSString *)apiForKey:(NSString*)key withParam:(NSDictionary *)param{
     NSString *v = [self apiForKey:key];

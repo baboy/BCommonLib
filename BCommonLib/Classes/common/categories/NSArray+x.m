@@ -89,7 +89,7 @@
         }else if([v respondsToSelector:@selector(dict)]){
             id dv = [v performSelector:@selector(dict) withObject:nil];
             if (dv) {
-                [json addObject:dv];
+                [json addObject:[dv json]];
             }
         }
     }

@@ -7,22 +7,23 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Model.h"
 
 extern NSString *HttpRequestDomain;
 
 enum{
-    ResponseStatusCodeSuccess=1,
+    ResponseStatusCodeSuccess=0,
     ResponseStatusCodeFail,
 };
 typedef int ResponseStatusCode;
 
-@interface HttpResponse : NSObject
-@property (nonatomic, assign) ResponseStatusCode status;
-@property (nonatomic, retain) NSString *msg;
-@property (nonatomic, retain) NSMutableDictionary *dict;
+@interface HttpResponse : Model
+@property (nonatomic, assign) int status;
+@property (nonatomic, strong) NSString *msg;
+@property (nonatomic, strong) NSString *errMsg;
+@property (nonatomic, strong) id data;
 + (id)responseWithDictionary:(NSDictionary *)dict;
++ (id)responseWithDictionary:(NSDictionary *)dict dataItemClass:(Class)itemClass;
 - (BOOL)isSuccess;
 - (NSError *)error;
-- (id)initWithDictionary:(NSDictionary *)dict;
-- (id)data;
 @end

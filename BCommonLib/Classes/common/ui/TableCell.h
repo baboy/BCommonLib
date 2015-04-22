@@ -12,6 +12,7 @@
 @property (nonatomic, retain) IBOutlet UIImageView *imgView;
 @property (nonatomic, retain) IBOutlet UILabel *titleLabel;
 @property (nonatomic, retain) IBOutlet UILabel *detailLabel;
+@property (nonatomic, retain) IBOutlet UILabel *remarkLabel;
 @property (nonatomic, retain) NSObject *object;
 - (void)setImageViewHidden:(BOOL)imageHidden;
 - (void)setImg:(UIImage *)image;

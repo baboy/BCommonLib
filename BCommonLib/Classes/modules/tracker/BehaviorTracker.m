@@ -12,6 +12,7 @@
 #import "BCommonLibHttp.h"
 #import "BCommonLibDao.h"
 #import "Global.h"
+#import "Device.h"
 
 #define LogApiRegisterDevice    @"http://app.tvie.com.cn/log/"
 #define LogApiPostEvent         @"http://app.tvie.com.cn/log/"
@@ -51,7 +52,7 @@ static NSString *LogSessionID = nil;
             }];
 }
 + (NSMutableDictionary *)deviceParam{
-    NSMutableDictionary *param = [NSMutableDictionary dictionaryWithDictionary:DeviceParam];
+    NSMutableDictionary *param = [NSMutableDictionary dictionaryWithDictionary:[[Device currentDevice] dict]];
     [param setValue:[MacAddress currentAddress] forKeyPath:@"mac"];
     [param setValue:[NetChecker access] forKeyPath:@"access"];
     [param setValue:[self appKey] forKeyPath:@"appkey"];

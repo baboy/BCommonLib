@@ -10,6 +10,8 @@
 
 @interface AppContext : NSObject
 // App namespace
-+ (BOOL) ns:(NSString *)ns;
++ (BOOL) setNs:(NSString *)ns;
 + (NSString *)ns;
++ (void) setDeviceToken:(NSString *)deviceToken;
++ (NSString *) deviceToken;
 @end

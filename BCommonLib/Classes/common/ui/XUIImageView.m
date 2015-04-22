@@ -31,22 +31,14 @@
         [self setImage:image];
     }
 }
-- (void)setImageURL:(NSURL *)url{
+- (void)setImageURLString:(NSString *)url{
     
     __weak __typeof(self)handler = self;
-    [super setImageURL:url withImageLoadedCallback:^(NSURL *imageURL, NSString *filePath, NSError *error) {
+    [super setImageURLString:url withImageLoadedCallback:^(NSString *url, NSString *filePath, NSError *error) {
         __strong __typeof(handler)handlerRef = handler;
         if (filePath)
             [handlerRef setImageAndNotify:[UIImage imageWithContentsOfFile:filePath]];
     }];
-}
-- (void)setImageURLString:(NSString *)urlString{
-    if ([urlString isURL]) {
-        DLOG(@"setImageURLString:%@",urlString);
-        [self setImageURL:[NSURL URLWithString:urlString]];
-    }else if([[NSFileManager defaultManager] fileExistsAtPath:urlString isDirectory:NO]){        
-        [self setImage:[UIImage imageWithContentsOfFile:urlString]];
-    }
 }
 - (void)tapEvent:(UIGestureRecognizer *)r{
     if (self.target && self.action && r.state == UIGestureRecognizerStateEnded) {
@@ -60,12 +52,12 @@
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapEvent:)];
     [self addGestureRecognizer:tap];
 }
-- (id)setImageURL:(NSURL *)imageURL placeholderImage:(UIImage *)placeholderImage withImageLoadedCallback:(void (^)(NSURL *imageURL, NSString *filePath, NSError *error))callback{
+- (id)setImageURLString:(NSString *)url placeholderImage:(UIImage *)placeholderImage withImageLoadedCallback:(void (^)(NSString *url, NSString *filePath, NSError *error))callback{
     if (self.operation && ![self.operation isCancelled]) {
         self.operation.completionBlock = nil;
         [self.operation cancel];
     }
-    self.operation = [super setImageURL:imageURL placeholderImage:placeholderImage withImageLoadedCallback:callback];
+    self.operation = [super setImageURLString:url placeholderImage:placeholderImage withImageLoadedCallback:callback];
     return self.operation;
 }
 - (void)dealloc{

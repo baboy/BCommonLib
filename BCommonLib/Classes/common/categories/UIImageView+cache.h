@@ -9,11 +9,11 @@
 #import <UIKit/UIKit.h>
 
 @interface UIImageView(cache)
-- (void)setImageURL:(NSURL *)imageURL;
-- (void)setImageURL:(NSURL *)imageURL placeholderImage:(UIImage *)placeholderImage;
-- (id)setImageURL:(NSURL *)imageURL withImageLoadedCallback:(void (^)(NSURL *imageURL, NSString *filePath, NSError *error))callback;
-- (id)setImageURL:(NSURL *)imageURL placeholderImage:(UIImage *)placeholderImage withImageLoadedCallback:(void (^)(NSURL *imageURL, NSString *filePath, NSError *error))callback;
+- (void)setImageURLString:(NSString *)url;
+- (void)setImageURLString:(NSString *)url placeholderImage:(UIImage *)placeholderImage;
+- (id)setImageURLString:(NSString *)url withImageLoadedCallback:(void (^)(NSString *url, NSString *filePath, NSError *error))callback;
+- (id)setImageURLString:(NSString *)url placeholderImage:(UIImage *)placeholderImage withImageLoadedCallback:(void (^)(NSString *url, NSString *filePath, NSError *error))callback;
 
-+ (NSString *)cachePathForURL:(NSURL *)imageURL;
-+ (NSData *)cacheDataForURL:(NSURL *)imageURL;
++ (NSString *)cachePathForURLString:(NSString *)url;
++ (NSData *)cacheDataForURLString:(NSString *)url;
 @end

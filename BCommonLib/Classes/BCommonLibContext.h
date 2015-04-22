@@ -25,4 +25,5 @@
 #import "Model.h"
 #import "BUser.h"
 #import "Application.h"
+#import "AppBaseDelegate.h"
 #endif

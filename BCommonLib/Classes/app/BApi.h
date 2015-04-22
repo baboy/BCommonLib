@@ -62,6 +62,7 @@
 
 @interface BApi :                          NSObject
 + (void)setup:(NSString                    *)plist;
++ (BOOL)setCommonParams:(NSDictionary *)params;
 + (NSString *)apiForKey:(NSString          *)key;
 + (NSString *)apiForKey:(NSString          *)key withParam:(NSDictionary *)param;
 @end

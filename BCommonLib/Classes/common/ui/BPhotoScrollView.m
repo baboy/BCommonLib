@@ -98,8 +98,7 @@
     ////
     _thumbnail = thumbnail;
     
-    NSURL *url = [thumbnail isURL] ? [NSURL URLWithString:thumbnail] : [NSURL fileURLWithPath:thumbnail];
-    [self.backgroundImageView setImageURL:url];
+    [self.backgroundImageView setImageURLString:thumbnail];
 }
 - (void)saveStatusBarStyle{
     self.statusBarStyle = [APP statusBarStyle];
@@ -114,7 +113,7 @@
     if (!image)
         return;
     float padding = 0;
-    float W = self.container.bounds.size.width - 2*padding, H = self.container.bounds.size.height- 2*padding;
+    float W = self.container.bounds.size.width - 2*padding/*, H = self.container.bounds.size.height- 2*padding*/;
     float imgWidth = MIN(W, image.size.width);
     float imgHeight = image.size.height*imgWidth/image.size.width;
     
@@ -238,8 +237,7 @@
     if (!self.origin) {
         return;
     }
-    NSURL *imageURL = [self.origin isURL] ? [NSURL URLWithString:self.origin]:[NSURL fileURLWithPath:self.origin];
-    [imgView setImageURL:imageURL placeholderImage:thumbnailImage withImageLoadedCallback:^(NSURL *imageURL, NSString *filePath, NSError *error) {
+    [imgView setImageURLString:self.origin placeholderImage:thumbnailImage withImageLoadedCallback:^(NSString *url, NSString *filePath, NSError *error) {
         [self.indicator stopAnimating];
         if (error) {
             [BIndicator showMessageAndFadeOut:error.localizedDescription];

@@ -16,6 +16,8 @@
 
 
 @interface BImageView()
+@property (nonatomic, strong) UIProgressView * progressView;
+
 - (void) handleTap:(UIGestureRecognizer *)recognizer;
 - (void) createSubviews;
 @end
@@ -31,19 +33,6 @@
 		self.backgroundColor = [UIColor clearColor];
 		self.clipsToBounds = YES;
         [self createSubviews];
-    }
-    return self;
-}
-
-- (id)initWithFrame:(CGRect)frame imageURL:(NSString *)url{	
-    self = [super initWithFrame:frame];
-    if (self) {
-        // Initialization code.
-        self.titleHeight = 20;
-		self.backgroundColor = [UIColor clearColor];
-		self.clipsToBounds = YES;
-        [self createSubviews];
-		[self setImageURL:url];
     }
     return self;
 }
@@ -96,12 +85,10 @@
 	}
 }
 - (void) setImageLocalPath:(NSString *)fp{
-	_imageLocalPath = nil;
-	_imageLocalPath = fp;
 	[_imgView setImage:[UIImage imageWithContentsOfFile:fp]];
 }
 - (void) setImageURL:(NSString *)imgUrl{
-    [self.imgView setImageURL:[NSURL URLWithString:imgUrl]];
+    [self.imgView setImageURLString:imgUrl];
 	
 }
 - (void) showProgress:(BOOL)showProgress{
@@ -123,14 +110,6 @@
     rect.origin.y -= 12;;
     rect.size.height=12;
     [_progressView setFrame:CGRectInset(rect, 3, 0)];
-}
-- (void)dealloc {
-	//[_object release];
-	//[_imageURL release];
-	//[_imageLocalPath release];
-    //[_imgView release];
-    //[_progressView release];
-    //[super dealloc];
 }
 
 

@@ -16,4 +16,7 @@
 - (NSString *)format:(NSString *)f;
 - (NSString *)formatToHumanLang;
 - (NSString *)GMTFormat;
+
+- (NSString *) formatMessageDate;
+- (NSString *) formatMessageDateShort;
 @end

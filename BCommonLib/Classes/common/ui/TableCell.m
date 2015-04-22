@@ -9,17 +9,6 @@
 #import "TableCell.h"
 
 @implementation TableCell
-- (void)dealloc{
-    ////
-    ////
-    ////
-    ////
-    //[super dealloc];
-}
-- (void)setFrame:(CGRect)frame{
-    [super setFrame:frame];
-    //DLOG(@"[TableCell] setFrame:%@", NSStringFromCGRect(frame));
-}
 - (void)setDetail:(NSString *)text{
     [self.self.detailLabel setText:text];
 }

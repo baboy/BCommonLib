@@ -8,6 +8,7 @@
 
 #ifndef BCommonLib_BCommonLibDao_h
 #define BCommonLib_BCommonLibDao_h
+
 #import "Dao.h"
 #import "BQueue.h"
 #import "DBCache.h"

@@ -10,9 +10,10 @@
 #import "Global.h"
 #import "BCommonLibDao.h"
 #import "Application.h"
+#import "Device.h"
 
 @implementation AppBaseDelegate
-- (void)registerNotify{
+- (void)registerNotification{
     if (DeviceToken) {
         return;
     }
@@ -22,11 +23,7 @@
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken{
     NSString *token = [[deviceToken description] stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"<>"]];
     token = [[token description] stringByReplacingOccurrencesOfString:@" " withString:@""];
-    [DBCache setValue:token forKey:@"device_token"];
-    [ApplicationVersion registerNotificationDeviceToken:token
-                                               callback:^(BHttpRequestOperation *operation, NSDictionary *json, NSError *error) {
-                                                   DLOG(@"token:%@",json);
-                                               }];
+    [Device currentDevice].deviceToken = deviceToken;
     DLOG(@"%@", token);
 }
 

@@ -10,39 +10,38 @@
 #import "Model.h"
 #import "BCommonLibHttp.h"
 
-#define Uid         [[BUser user] uid]?:@""
-#define UKey        [[BUser user] ukey]?:@""
-#define USER        [BUser user]
+#define Uid         [[BUser loginUser] uid]?:@""
+#define UKey        [[BUser loginUser] ukey]?:@""
+#define USER        [BUser loginUser]
 
 #define UserParams  [NSMutableDictionary dictionaryWithObjectsAndKeys:UKey, @"ukey", nil]
 
 
 @interface BUser : Model
-@property (nonatomic, assign) NSString *uid;
-@property (nonatomic, assign) NSString *username;
-@property (nonatomic, assign) NSString *nickname;
-@property (nonatomic, assign) NSString *password;
-@property (nonatomic, assign) NSString *email;
-@property (nonatomic, assign) NSString *ukey;
-@property (nonatomic, assign) NSString *name;
-@property (nonatomic, assign) NSString *signature;
-@property (nonatomic, assign) NSString *desc;
-@property (nonatomic, assign) NSString *avatar;
-@property (nonatomic, assign) NSString *avatarThumbnail;
+@property (nonatomic, assign) long long uid;
+@property (nonatomic, strong) NSString *username;
+@property (nonatomic, strong) NSString *nickname;
+@property (nonatomic, strong) NSString *password;
+@property (nonatomic, strong) NSString *email;
+@property (nonatomic, strong) NSString *ukey;
+@property (nonatomic, strong) NSString *name;
+@property (nonatomic, strong) NSString *displayName;
+@property (nonatomic, strong) NSString *signature;
+@property (nonatomic, strong) NSString *desc;
+@property (nonatomic, strong) NSString *avatar;
+@property (nonatomic, strong) NSString *avatarThumbnail;
 @property (nonatomic, assign) NSInteger gender;
-@property (nonatomic, assign) NSString *education;
-@property (nonatomic, assign) NSString *school;
-@property (nonatomic, assign) NSString *mobile;
-@property (nonatomic, assign) NSString *birthday;
+@property (nonatomic, strong) NSString *education;
+@property (nonatomic, strong) NSString *school;
+@property (nonatomic, strong) NSString *mobile;
+@property (nonatomic, strong) NSString *birthday;
+@property (nonatomic, strong) NSString *pinyin;
 @property (nonatomic, assign) NSInteger age;
-@property (nonatomic, assign) NSDictionary *metadata;
-- (id)initWithDictionary:(NSDictionary *)dict;
-- (NSDictionary *)dict;
-- (id)get:(NSString *)key;
-- (void)setValue:(id)val forKey:(NSString *)key;
+@property (nonatomic, strong) NSDictionary *metadata;
+
 + (BOOL)isLogin;
 //当前登录用户
-+ (id) user;
++ (id) loginUser;
 //用该用户信息登录
 + (BOOL)loginWithUser:(BUser *)user;
 //登出

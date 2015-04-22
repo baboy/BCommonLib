@@ -41,21 +41,27 @@ static char UIImageViewCacheOperationObjectKey;
     [self.requestOperation cancel];
     self.requestOperation = nil;
 }
-- (id)setImageURL:(NSURL *)imageURL placeholderImage:(UIImage *)placeholderImage withImageLoadedCallback:(void (^)(NSURL *imageURL, NSString *filePath, NSError *error))callback{
+- (id)setImageURLString:(NSString *)url placeholderImage:(UIImage *)placeholderImage withImageLoadedCallback:(void (^)(NSString *url, NSString *filePath, NSError *error))callback{
     [self cancelImageRequestOperation];
-    NSString *fp = [UIImageView cachePathForURL:imageURL];
-    if (fp) {
+    
+    NSString *fp = nil;
+    if ([url isURL]) {
+        fp = [UIImageView cachePathForURLString:url];;
+    }else{
+        fp = url;
+    }
+    if ([fp fileExists]) {
         UIImage *img = [UIImage imageWithContentsOfFile:fp];
         if (img) {
             self.image = img;
             if (callback) {
-                callback(imageURL,fp,nil);
+                callback(url,fp,nil);
             }
             return nil;
         }
     }
     self.image = placeholderImage;
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:imageURL];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
     BHttpRequestOperation *operation = [[BHttpRequestOperation alloc] initWithRequest:request];
     [operation setCompletionBlockWithSuccess:^(id operation, id responseObject) {
         NSDictionary *userInfo = [operation userInfo];
@@ -66,14 +72,14 @@ static char UIImageViewCacheOperationObjectKey;
                 [self setImage:[UIImage imageWithContentsOfFile:fp]];
             }
             if (callback) {
-                callback(imageURL, fp, nil);
+                callback(url, fp, nil);
             }
         }
         
     }
                                      failure:^(AFHTTPRequestOperation *operation, NSError *error) {
                                          if (callback) {
-                                             callback(imageURL, nil, error);
+                                             callback(url, nil, error);
                                          }
                                          
                                      }];
@@ -83,21 +89,21 @@ static char UIImageViewCacheOperationObjectKey;
     [[[self class] sharedImageRequestOperationQueue] addOperation:self.requestOperation];
     return operation;
 }
-- (void)setImageURL:(NSURL *)imageURL{
-    [self setImageURL:imageURL placeholderImage:nil withImageLoadedCallback:nil];
+- (void)setImageURLString:(NSString *)url{
+    [self setImageURLString:url placeholderImage:nil withImageLoadedCallback:nil];
 }
-- (void)setImageURL:(NSURL *)imageURL placeholderImage:(UIImage *)placeholderImage{
-    [self setImageURL:imageURL placeholderImage:placeholderImage withImageLoadedCallback:nil];
-}
-
-- (id)setImageURL:(NSURL *)imageURL withImageLoadedCallback:(void (^)(NSURL *imageURL, NSString *filePath, NSError *error))callback{
-    return [self setImageURL:imageURL placeholderImage:nil withImageLoadedCallback:callback];
+- (void)setImageURLString:(NSString *)url placeholderImage:(UIImage *)placeholderImage{
+    [self setImageURLString:url placeholderImage:placeholderImage withImageLoadedCallback:nil];
 }
 
-+ (NSString *)cachePathForURL:(NSURL *)imageURL{
-    return [BHttpRequestCacheHandler cachePathForURL:imageURL];
+- (id)setImageURLString:(NSString *)url withImageLoadedCallback:(void (^)(NSString *url, NSString *filePath, NSError *error))callback{
+    return [self setImageURLString:url placeholderImage:nil withImageLoadedCallback:callback];
 }
-+ (NSData *)cacheDataForURL:(NSURL *)imageURL{
-    return [BHttpRequestCacheHandler cacheDataForURL:imageURL];
+
++ (NSString *)cachePathForURLString:(NSString *)url{
+    return [BHttpRequestCacheHandler cachePathForURL:[NSURL URLWithString:url]];
+}
++ (NSData *)cacheDataForURLString:(NSString *)url{
+    return [BHttpRequestCacheHandler cacheDataForURL:[NSURL URLWithString:url]];
 }
 @end

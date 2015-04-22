@@ -33,7 +33,7 @@
     if ( [url fileExists] ) {
         image = [UIImage imageWithContentsOfFile:url];
     }else{
-        NSString *fp = [UIImageView cachePathForURL:[NSURL URLWithString:url]];
+        NSString *fp = [UIImageView cachePathForURLString:url];
         if ([fp fileExists]) {
             image = [UIImage imageWithContentsOfFile:fp];
         }

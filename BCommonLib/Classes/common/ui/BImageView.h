@@ -14,23 +14,20 @@ typedef enum {
     BImageTitleStyleBelow
 } BImageTitleStyle;
 
-@interface BImageView : XUIView {
-	NSString *		_imageLocalPath;
-	id				_target;
-	SEL				_action;
-	float			_padding;
-    UIProgressView *    _progressView;
-}
+@interface BImageView : XUIView 
+@property (nonatomic, assign) id target;
+@property (nonatomic, assign) SEL action;
 @property (nonatomic, retain) UIImageView *imgView;
 @property (nonatomic, retain) UILabel *titleLabel;
+
 @property (nonatomic, retain) NSObject *object;
-@property (nonatomic, retain) NSString *imageURL;
-@property (nonatomic, assign) float padding;
+
+@property (nonatomic, assign) CGFloat padding;
+
 @property (nonatomic, assign) BImageTitleStyle titleStyle;
 @property (nonatomic, assign) float titleHeight;
 
-- (id)initWithFrame:(CGRect)frame imageURL:(NSString *)url;
 - (void) addTarget:(id)target action:(SEL)action;
-- (void)setRadius:(float)rad;
+- (void) setRadius:(float)rad;
 - (void) showProgress:(BOOL)showProgress;
 @end

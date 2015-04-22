@@ -9,6 +9,15 @@
 #import <UIKit/UIKit.h>
 
 @interface AppBaseDelegate : UIResponder
-- (void)registerNotify;
+- (void)registerNotification;
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken;
 - (UIAlertView*)alertWithTitle:(NSString *)title message:(NSString *)msg button:(NSString *)buttonTitle,...;
+
+- (void)applicationWillResignActive:(UIApplication *)application;
+- (void)applicationDidEnterBackground:(UIApplication *)application;
+
+- (void)applicationWillEnterForeground:(UIApplication *)application;
+
+- (void)applicationDidBecomeActive:(UIApplication *)application ;
+- (void)applicationWillTerminate:(UIApplication *)application ;
 @end

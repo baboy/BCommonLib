@@ -13,5 +13,5 @@
 #import "BrowserController.h"
 #import "SettingBaseViewController.h"
 #import "TabBarMoreViewController.h"
-#import "XUIViewController.h
+#import "XUIViewController.h"
 #endif

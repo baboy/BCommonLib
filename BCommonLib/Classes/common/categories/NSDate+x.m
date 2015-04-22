@@ -63,4 +63,42 @@
     [gmtFormatter setTimeZone:tz];
     return [gmtFormatter stringFromDate:self];
 }
+- (NSString *) formatMessageDate{
+    NSDate *now =[NSDate date];
+    long long oneDay = 24*3600*1000l;
+    long long oneWeek = oneDay*6;
+    long long oneMonth = oneDay*30;
+    long long halfYear = oneMonth*6;
+    
+    NSString *f = @"HH:mm";
+    long long diff = [now timeIntervalSinceDate:self];
+    if( diff > halfYear){
+        f = @"yyyy-MM-dd HH:mm";
+    }else if(diff > oneWeek){
+        f = @"MM-dd HH:mm";
+    }else if(diff > oneDay){
+        f = @"EEE HH:mm";
+    }
+    
+    return [self format:f];
+}
+- (NSString *) formatMessageDateShort{
+    NSDate *now =[NSDate date];
+    long long oneDay = 24*3600*1000l;
+    long long oneWeek = oneDay*6;
+    long long oneMonth = oneDay*30;
+    long long halfYear = oneMonth*6;
+    
+    NSString *f = @"HH:mm";
+    long long diff = [now timeIntervalSinceDate:self];
+    if( diff > halfYear){
+        f = @"yyyy-MM-dd";
+    }else if(diff > oneWeek){
+        f = @"MM-dd";
+    }else if(diff > oneDay){
+        f = @"EEE";
+    }
+    
+    return [self format:f];
+}
 @end

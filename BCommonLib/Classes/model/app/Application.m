@@ -12,6 +12,7 @@
 #import "Global.h"
 #import "Group.h"
 #import "BCommonLibDao.h"
+#import "Device.h"
 
 @implementation Application
 - (void)dealloc{
@@ -54,7 +55,7 @@
 #pragma mark -- 请求应用列表
 + (BHttpRequestOperation *)getAppListCallback:(void(^)(BHttpRequestOperation *operation, NSArray *response, NSError *error))callback{
     
-    id param = DeviceParam;
+    id param = [[Device currentDevice] dict];
     return [[BHttpRequestManager defaultManager]
             jsonRequestOperationWithGetRequest:ApiQueryAppList
             parameters:param
@@ -92,7 +93,7 @@
 
 + (BHttpRequestOperation *)getAppAboutWithOutput:(NSString *)output callback:(void(^)(BHttpRequestOperation *operation,id response,NSError *error))callback{
     output = output ?:@"html";
-    NSMutableDictionary *param = [NSMutableDictionary dictionaryWithDictionary:DeviceParam];
+    NSMutableDictionary *param = [NSMutableDictionary dictionaryWithDictionary:[[Device currentDevice] dict]];
     [param setValue:output forKey:@"output"];
     return [[BHttpRequestManager defaultManager]
             dataRequestWithURLRequest:ApiQueryAbout
@@ -126,7 +127,7 @@
 }
 
 + (BHttpRequestOperation *)feedback:(NSString *)content callback:(void (^)(id operation,id response, NSError *error))callback {
-    NSMutableDictionary *param = [NSMutableDictionary dictionaryWithDictionary:DeviceParam];
+    NSMutableDictionary *param = [NSMutableDictionary dictionaryWithDictionary:[[Device currentDevice] dict]];
     [param setValue:content forKey:@"content"];
     [param setValue:APPID forKey:@"appid"];
     return [[BHttpRequestManager defaultManager]
@@ -174,7 +175,7 @@
 + (BHttpRequestOperation *)getAppVersionCallback:(void(^)(BHttpRequestOperation *operation, ApplicationVersion* app,NSError *error))callback{
     
     
-    id param = DeviceParam;
+    id param = [[Device currentDevice] dict];
     return [[BHttpRequestManager defaultManager]
             jsonRequestOperationWithGetRequest:ApiQueryAppVersion
             parameters:param
@@ -205,7 +206,7 @@
 
 + (BHttpRequestOperation *)registerNotificationDeviceToken:(NSString *)token callback:(void(^)(BHttpRequestOperation *operation, NSDictionary *json, NSError *error))callback{
     
-    NSMutableDictionary *param = [NSMutableDictionary dictionaryWithDictionary:DeviceParam];
+    NSMutableDictionary *param = [NSMutableDictionary dictionaryWithDictionary:[[Device currentDevice] dict]];
     [param setValue:token forKey:@"token"];
     return [[BHttpRequestManager defaultManager]
             jsonRequestOperationWithPostRequest:ApiRegisterDeviceToken

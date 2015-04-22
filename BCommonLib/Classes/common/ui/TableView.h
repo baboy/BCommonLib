@@ -32,7 +32,6 @@ typedef NSInteger SeparatorLineStyle;
 
 @interface TableViewSectionView : TableViewCellBackground
 
-@property (nonatomic, retain) UIImage *backgroundImage;
 @property (nonatomic, readonly) UILabel *titleLabel;
 @property (nonatomic, readonly) UILabel *rightLabel;
 @property (nonatomic, retain) NSString *title;
