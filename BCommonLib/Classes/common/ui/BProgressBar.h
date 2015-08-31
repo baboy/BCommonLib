@@ -11,8 +11,21 @@
 
 @interface BProgressBar : UIView
 
-@property (nonatomic, retain) UIColor *borderColor;
-@property (nonatomic, retain) UIColor *barColor;
+@property (nonatomic, strong) UIColor *borderColor;
+@property (nonatomic, strong) UIColor *barColor;
 @property (nonatomic, assign) float padding;
-@property (nonatomic, assign) float progress;
+@property (nonatomic, assign) double progress;
+@end
+
+@interface CircleProgressBar : BProgressBar
+@property (nonatomic, strong) UIColor *backgroundStrokeColor;
+@property (nonatomic, assign) CGFloat strokeWidth;
+@property (nonatomic, strong) UIFont *textFont;
+@property (nonatomic, strong) UIColor *textColor;
+
+@end
+
+
+@interface VolumeCircleProgressBar : BProgressBar
+@property (nonatomic, assign) CGFloat strokeWidth;
 @end

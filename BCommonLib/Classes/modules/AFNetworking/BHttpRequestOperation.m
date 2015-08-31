@@ -127,7 +127,7 @@ typedef void (^AFURLConnectionOperationProgressBlock)(NSUInteger bytes, long lon
     if (self.cacheFilePath) {
         DLOG(@"renameto");
         [self.cacheFilePath deleteFile];
-        BOOL flag = [self.tmpFilePath renameToPath:self.cacheFilePath];
+        BOOL flag = [self.tmpFilePath renameFileTo:self.cacheFilePath];
         if (![self.cacheFilePath fileExists]) {
             DLOG(@"cache file:%d", flag);
         }

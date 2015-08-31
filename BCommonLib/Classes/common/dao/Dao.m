@@ -54,7 +54,7 @@ static NSMutableDictionary *_dbPool_ = nil;
 + (FMDatabase*)db:(NSString *)ns{
     FMDatabase *dbase = [[self dbPool] valueForKey:ns];
     if (!dbase) {
-        NSString *dbName = getFilePath([NSString stringWithFormat:@"%@.db", ns], nil, nil);
+        NSString *dbName = getFilePath(nil,[NSString stringWithFormat:@"%@.db", ns], nil);
         DLOG(@"init db:%@", dbName);
         dbase = [FMDatabase databaseWithPath:dbName];
         [[self dbPool] setValue:dbase forKey:ns];

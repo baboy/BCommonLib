@@ -10,6 +10,7 @@
 #import "Utils.h"
 #import "Global.h"
 #import "BCommonLibCategories.h"
+#import "AppContext.h"
 
 @implementation BHttpRequestCacheHandler
 + (id)defaultCacheHandler{
@@ -45,7 +46,7 @@
 + (NSString *)cachePathForURL:(NSURL *)url{
     NSString *fn = [[url absoluteString] md5];
     NSString *ext = [url pathExtension];
-    return getFilePath(fn, ext, gImageCacheDir);
+    return [AppCache cachePath:[NSString stringWithFormat:@"%@.%@",fn,ext]];
 }
 + (NSData *)cacheDataForURL:(NSURL *)url{
     NSString *fp = [self cachePathForURL:url];

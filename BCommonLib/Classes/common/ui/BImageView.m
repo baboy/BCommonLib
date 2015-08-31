@@ -9,6 +9,7 @@
 #import "BImageView.h"
 #import "BCommonLibContext.h"
 #import "BCommonLibCategories.h"
+#import "UIButton+x.h"
 
 #define BImgViewTitleFont			[UIFont boldSystemFontOfSize:12]
 #define BImgViewTitleColor			[UIColor whiteColor]
@@ -37,11 +38,11 @@
     return self;
 }
 - (void) createSubviews{
-    _imgView = [[UIImageView alloc] initWithFrame:self.bounds];
-    _imgView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    _imgView.clipsToBounds = YES;
-    [_imgView setContentMode:UIViewContentModeScaleAspectFill];
-    [self addSubview:_imgView];
+    self.button = [[UIButton alloc] initWithFrame:self.bounds];
+    self.button.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.button.clipsToBounds = YES;
+    [self.button setContentMode:UIViewContentModeScaleAspectFill];
+    [self addSubview:self.button];
     
     _titleLabel = createLabel(CGRectZero, BImgViewTitleFont, [UIColor clearColor], BImgViewTitleColor, BImgViewTitleShadowColor, CGSizeMake(0, 1), NSTextAlignmentCenter, 1, NSLineBreakByTruncatingTail);
     _titleLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -65,7 +66,7 @@
     _titleStyle = titleStyle;
     [self setNeedsLayout];
 }
-- (void) setPadding:(float)padding{
+- (void) setPadding:(CGFloat)padding{
 	_padding = padding;	
     [self setNeedsLayout];
 }
@@ -85,10 +86,10 @@
 	}
 }
 - (void) setImageLocalPath:(NSString *)fp{
-	[_imgView setImage:[UIImage imageWithContentsOfFile:fp]];
+	[self.button setImage:[UIImage imageWithContentsOfFile:fp] forState:UIControlStateNormal];
 }
 - (void) setImageURL:(NSString *)imgUrl{
-    [self.imgView setImageURLString:imgUrl];
+    [self.button setImageURLString:imgUrl forState:UIControlStateNormal];
 	
 }
 - (void) showProgress:(BOOL)showProgress{
@@ -96,7 +97,7 @@
 }
 - (void)setRadius:(float)rad{
     [self.layer setCornerRadius:rad];
-    [_imgView.layer setCornerRadius:rad];
+    [self.button.layer setCornerRadius:rad];
 }
 - (void) layoutSubviews{
     [super layoutSubviews];
@@ -104,7 +105,7 @@
     if (_titleStyle == BImageTitleStyleBelow) {
         rect.size.height -= self.titleHeight;
     }
-    [_imgView setFrame:CGRectInset(rect, _padding, _padding)];
+    [self.button setFrame:CGRectInset(rect, _padding, _padding)];
     rect = CGRectMake(0, self.bounds.size.height-self.titleHeight, self.bounds.size.width, self.titleHeight);
     [_titleLabel setFrame:rect];
     rect.origin.y -= 12;;

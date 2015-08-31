@@ -18,12 +18,14 @@
 
 
 extern NSString * getImageCacheDir();
-extern NSString * getFilePath(NSString *fn, NSString *ext, NSString *dir);
+extern NSString * getFilePath(NSString *dir,NSString *fn, NSString *ext);
 extern NSString * getBundleFile(NSString *fn);
 extern NSString * getBundleFileFromBundle(NSString *fn,
                                           NSString *fileType,
                                           NSString *bundleName,
                                           NSString *inDir);
+
+extern NSString * getCacheDir(NSString *dir);
 extern NSString * getTempFilePath(NSString *fn);
 extern id nullToNil(id obj);
 extern id nilToNull(id obj);
@@ -34,34 +36,15 @@ extern NSString * getChineseCalendar(NSDate * date);
 extern BOOL isSetAlarm(NSString *key, NSString *value);
 extern BOOL setAlarm(NSString *key, id userInfo, NSString *msg, NSString *action, NSTimeInterval t);
 
-@interface Utils : NSObject {
-
-};
-+ (NSString *)	getBundleFile:(NSString *)fn;
-
-+ (NSString *)getFilePath:(NSString *)fn;
-+ (NSString *)getFilePath:(NSString *)fn inDir:(NSString *)dir;
-+ (NSString *)	getFilePath:(NSString *)fn ext:(NSString *)ext inDir:(NSString *)dir;
-
-+ (BOOL) moveFile:(NSString *)srcPath toFile:(NSString *)dstPath;
+@interface Utils : NSObject 
 + (BOOL)			createNewFileAtPath:(NSString *)fn;
 + (BOOL)			createFileIfNotExist:(NSString *)fn;
 + (long long)	sizeOfFile:(NSString *)fn;
 + (NSString *)	format:(NSString *)f time:(long long )t;
 + (NSString *) formatSize:(long long)size;
 + (NSString *)	formatToTime:(NSInteger)t;
-+ (NSData *)	getWebCache:(NSString *)key;
-+ (NSString *)	getCacheFile:(NSString *)key;
-+ (NSString *)	saveWebCache:(NSString *)key data:(NSData *)cacheData;
-+ (NSString *)	removeHTMLTag:(NSString *)html;
-+ (NSString *)	serializeNetParams:(NSDictionary *)dict;
-+ (NSString *)	serializeURL:(NSString *)url params:(NSDictionary *)dict;
 + (NSString *)	getChineseWeek:(int)n;
 + (NSInteger)	getStartTimestampOfDay:(long long)time;
 + (NSInteger)	getEndTimestampOfDay:(long long)time;
 + (NSInteger)	getEndTimestampOfHour:(long long)time;
-+ (NSDictionary *) parseURL:(NSString *)url withParam:(NSDictionary *)param;
-+ (NSString *)	url:(NSString *)url withParam:(NSDictionary *)param;
-+ (NSArray *)	parsePlaceholders:(NSString *)url;
-+ (NSString *)	url:(NSString *)url replaceholders:(NSDictionary *)param;
 @end

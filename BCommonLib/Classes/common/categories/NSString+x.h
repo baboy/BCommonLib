@@ -28,15 +28,18 @@
 - (NSString *)shortPinyin;
 - (BOOL)isEmail;
 - (BOOL)testRegex:(NSString *)re;
-- (BOOL)copyToPath:(NSString *)newPath;
-- (BOOL)renameToPath:(NSString *)newPath;
+
+/******* file operation*******/
+- (NSError *)removeFile;
+- (BOOL)copyFileTo:(NSString *)newPath;
 - (BOOL)deleteFile;
 - (long long)sizeOfFile;
+- (BOOL)fileExists;
+- (BOOL)renameFileTo:(NSString *)to;
+
 - (id)json;
 - (NSString *)base64SHA1HmacWithKey:(NSString *)key;
-- (NSError *)removeFile;
 - (int)textCount;
-- (BOOL)fileExists;
 - (NSString *)pinyin;
 - (NSArray *) placeholders;
 - (NSString *) replaceholders:(NSDictionary *)param;

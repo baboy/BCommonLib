@@ -14,26 +14,19 @@
                                                                 failure:(void (^)(BHttpRequestOperation *operation, NSError *error))failure{
     return [self createHttpRequestOperationWithRequest:request
                                     responseSerializer:[AFHTTPResponseSerializer serializer]
-                                              callback:^(id operation, id data, bool isReadFromCache, NSError *error) {
-                                                  if (error && !isReadFromCache) {
-                                                      failure(operation, error);
-                                                  }else{
-                                                      success(operation, data);
-                                                  }
-                                              }];
+                                               success:^(BHttpRequestOperation *operation, id data, bool isReadFromCache) {
+                                                   success(operation, data);
+                                               }
+                                               failure:failure];
 }
 - (BHttpRequestOperation *)createJsonHttpRequestOperationWithRequest:(NSURLRequest *)request
                                                              success:(void (^)(BHttpRequestOperation *operation, id responseObject))success
                                                              failure:(void (^)(BHttpRequestOperation *operation, NSError *error))failure{
     return [self createHttpRequestOperationWithRequest:request
                                     responseSerializer:[AFJSONResponseSerializer serializer]
-                                              callback:^(id operation, id data, bool isReadFromCache, NSError *error) {
-                                                  if (error && !isReadFromCache) {
-                                                      failure(operation, error);
-                                                  }else{
-                                                      success(operation, data);
-                                                  }
-                                              }];
+                                               success:^(BHttpRequestOperation *operation, id data, bool isReadFromCache) {
+                                                   success(operation, data);
+                                               } failure:failure];
 }
 
 - (BHttpRequestOperation *)jsonRequestOperationWithGetRequest:(NSString *)URLString

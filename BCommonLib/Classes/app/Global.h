@@ -55,7 +55,7 @@
 #define gTablePicBorderColor       [UIColor whiteColor]
 #define gTablePicShadowColor        [UIColor colorWithWhite:0 alpha:0.6]
 
-#define gImageCacheDir              @"cache_image"
+#define FILE_CACHE_DIR              @".cache"
 
 
 #define DaySec                      (3600*24)

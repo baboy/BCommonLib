@@ -11,6 +11,7 @@
 #import "BCommonLibHttp.h"
 #import "Utils.h"
 #import "BApi.h"
+#import "NSString+x.h"
 
 @implementation BMapLocation
 @synthesize address = _address;
@@ -109,7 +110,7 @@
      }];
 }
 + (BHttpRequestOperation *)search:(NSString *)location callback:(void (^)(BHttpRequestOperation *operation,NSArray *locs, NSError *error))callback{
-    NSString *url = [Utils url:ApiQueryLocation withParam:@{@"q":location}];
+    NSString *url = [ApiQueryLocation URLStringWithParam:@{@"q":location}];
     return [[BHttpRequestManager defaultManager]
      jsonRequestOperationWithGetRequest:url
      parameters:nil

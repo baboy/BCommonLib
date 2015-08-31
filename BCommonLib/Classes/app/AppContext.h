@@ -15,3 +15,8 @@
 + (void) setDeviceToken:(NSString *)deviceToken;
 + (NSString *) deviceToken;
 @end
+
+@interface AppCache : NSObject
++ (NSString *) cachePath:(NSString *)fn;
++ (NSString *) crateCachePathWithExtension:(NSString *)ext;
+@end

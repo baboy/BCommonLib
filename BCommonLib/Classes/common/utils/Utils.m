@@ -20,7 +20,7 @@
 NSString * getImageCacheDir(){
     NSString *documentsDirectory = [DOMAIN_DIRS objectAtIndex:0];
 	NSFileManager *fileManager = [NSFileManager defaultManager];
-	NSString *dir = [documentsDirectory stringByAppendingPathComponent:gImageCacheDir];
+	NSString *dir = [documentsDirectory stringByAppendingPathComponent:FILE_CACHE_DIR];
 	if(![fileManager fileExistsAtPath:dir]){
 		if(![fileManager createDirectoryAtPath:dir withIntermediateDirectories:NO attributes:nil error:nil]){
 			return nil;
@@ -37,8 +37,19 @@ NSString * getBundleFileFromBundle(NSString *fn, NSString *fileType,NSString *bu
 	NSString *fp = [bundle pathForResource:fn ofType:fileType inDirectory:inDir];
 	return fp;//[[NSFileManager defaultManager] fileExistsAtPath:fp]?fp:nil;
 }
-
-NSString * getFilePath(NSString *fn, NSString *ext, NSString *dir){
+NSString * getCacheDir(NSString *dir){
+    NSString *documentsDirectory = [DOMAIN_DIRS objectAtIndex:0];
+    NSString *d = dir?[documentsDirectory stringByAppendingPathComponent:dir]:documentsDirectory;
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if(![fileManager fileExistsAtPath:d]){
+        if(![fileManager createDirectoryAtPath:d withIntermediateDirectories:NO attributes:nil error:nil]){
+            return nil;
+        }
+    }
+    return d;
+}
+NSString * getFilePath(NSString *dir,NSString *fn, NSString *ext){
     NSString *documentsDirectory = [DOMAIN_DIRS objectAtIndex:0];
 	NSString *d = dir?[documentsDirectory stringByAppendingPathComponent:dir]:documentsDirectory;
 	
@@ -48,11 +59,13 @@ NSString * getFilePath(NSString *fn, NSString *ext, NSString *dir){
 			return nil;
 		}
 	}
-	
-	NSString *fp = [d stringByAppendingPathComponent:fn];
-	if (ext && ![ext isEqualToString:@""]) {
-		fp = [fp stringByAppendingPathExtension:ext];
-	}
+    NSString *fp = d;
+    if(fn){
+        fp = [d stringByAppendingPathComponent:fn];
+        if (ext && ![ext isEqualToString:@""]) {
+            fp = [fp stringByAppendingPathExtension:ext];
+        }
+    }
 	return fp;
 }
 NSString * getTempFilePath(NSString *fn){
@@ -166,31 +179,6 @@ BOOL setAlarm(NSString *key, id userInfo, NSString *msg, NSString *action, NSTim
 
 
 @implementation Utils
-+ (NSString *)getFilePath:(NSString *)fn{
-	NSString *documentDirectory = [DOMAIN_DIRS objectAtIndex:0];
-	NSString *fp = [documentDirectory stringByAppendingPathComponent:fn];
-	return fp;
-}
-+ (NSString *)getFilePath:(NSString *)fn inDir:(NSString *)dir{
-	return [Utils getFilePath:fn ext:nil inDir:dir];
-}
-+ (NSString *)	getFilePath:(NSString *)fn ext:(NSString *)ext inDir:(NSString *)dir{
-	NSString *documentsDirectory = [DOMAIN_DIRS objectAtIndex:0];
-	NSString *d = [documentsDirectory stringByAppendingPathComponent:dir];
-	
-	NSFileManager *fileManager = [NSFileManager defaultManager];
-	if(![fileManager fileExistsAtPath:d]){
-		if(![fileManager createDirectoryAtPath:d withIntermediateDirectories:NO attributes:nil error:nil]){
-			return nil;
-		}
-	}
-	
-	NSString *fp = [d stringByAppendingPathComponent:fn];
-	if (ext) {
-		fp = [fp stringByAppendingPathExtension:ext];
-	}
-	return fp;
-}
 + (BOOL) createNewFileAtPath:(NSString *)fn{	
 	NSFileManager *fileManager = [NSFileManager defaultManager];
 	if ([fileManager fileExistsAtPath:fn]) {
@@ -211,10 +199,6 @@ BOOL setAlarm(NSString *key, id userInfo, NSString *msg, NSString *action, NSTim
 	NSFileManager *fileManager = [NSFileManager defaultManager]; 
 	NSDictionary *attrs = [fileManager attributesOfItemAtPath:fn error: NULL]; 
 	return [attrs fileSize]; 
-}
-+ (BOOL) moveFile:(NSString *)srcPath toFile:(NSString *)dstPath{
-	NSFileManager *fileManager = [NSFileManager defaultManager];
-	return [fileManager moveItemAtPath:srcPath toPath:dstPath error:nil];
 }
 + (NSString *)format:(NSString *)f time:(long long )t{
 	if ( [[NSString stringWithFormat:@"%qi",t] length] > 10 ) {
@@ -273,57 +257,6 @@ BOOL setAlarm(NSString *key, id userInfo, NSString *msg, NSString *action, NSTim
 	if ([str length]==0 || s) [str appendFormat:@"%ld秒",(long)s];
 	return str;
 }
-+ (NSData *) getWebCache:(NSString *)key{	
-	NSString *documentsDirectory = [DOMAIN_DIRS objectAtIndex:0];
-	NSFileManager *fileManager = [NSFileManager defaultManager];
-	NSString *dir = [documentsDirectory stringByAppendingPathComponent:WEB_CACHE_DIR];
-	NSString *file = [dir stringByAppendingPathComponent:key];
-	if ([fileManager fileExistsAtPath:file]) {
-		NSData *cahcheData = [fileManager contentsAtPath:file];
-		return cahcheData;
-	}
-	return nil;
-}
-+ (NSString *) getCacheFile:(NSString *)key{
-	//DLOG(@"util getCacheFile:%@",key);
-	NSString *documentsDirectory = [DOMAIN_DIRS objectAtIndex:0];
-	NSFileManager *fileManager = [NSFileManager defaultManager];
-	NSString *dir = [documentsDirectory stringByAppendingPathComponent:WEB_CACHE_DIR];
-	NSString *file = [dir stringByAppendingPathComponent:key];
-	if ([fileManager fileExistsAtPath:file]) {
-		return file;
-	}
-	return nil;
-}
-+ (BOOL) removeCacheFile:(NSString *)key{
-	//DLOG(@"util getCacheFile:%@",key);	
-	NSString *documentsDirectory = [DOMAIN_DIRS objectAtIndex:0];
-	NSFileManager *fileManager = [NSFileManager defaultManager];
-	NSString *dir = [documentsDirectory stringByAppendingPathComponent:WEB_CACHE_DIR];
-	NSString *file = [dir stringByAppendingPathComponent:key];
-	if ([fileManager fileExistsAtPath:file]) {
-		return [fileManager removeItemAtPath:nil error:nil];
-	}
-	return NO;
-}
-+ (NSString *) saveWebCache:(NSString *)key data:(NSData *)cacheData{	
-	NSString *documentsDirectory = [DOMAIN_DIRS objectAtIndex:0];
-	NSFileManager *fileManager = [NSFileManager defaultManager];
-	NSString *dir = [documentsDirectory stringByAppendingPathComponent:WEB_CACHE_DIR];
-	if(![fileManager fileExistsAtPath:dir]){
-		if(![fileManager createDirectoryAtPath:dir attributes:nil]){
-			return nil;
-		}
-	}
-	NSString *file = [dir stringByAppendingPathComponent:key];
-	if([fileManager fileExistsAtPath:file]){
-		NSError *err;
-		if (![fileManager removeItemAtPath:file error:&err]) {
-			return nil;
-		}
-	}
-	return [fileManager createFileAtPath:file contents:cacheData attributes:nil]?file:nil;
-}
 + (NSString *) removeHTMLTag:(NSString *)html{
 	NSString *s = [html stringByReplacingOccurrencesOfRegex:@"<[^>]+>" withString:@""];
 	s = [s stringByReplacingOccurrencesOfRegex:@"&nbsp;?" withString:@""];
@@ -331,52 +264,6 @@ BOOL setAlarm(NSString *key, id userInfo, NSString *msg, NSString *action, NSTim
 	return s;
 }
 
-+ (NSString *)	serializeNetParams:(NSDictionary *)dict{
-	if (!dict) {
-		return nil;
-	}
-	NSMutableString *s = [NSMutableString stringWithCapacity:10];
-	NSArray *keys = [dict allKeys];
-	NSInteger n = [keys count];
-	NSString *sep = @"&";
-	for (int i=0; i<n; i++) {
-		NSString *k = [keys objectAtIndex:i];
-		id v = [dict valueForKey:k];
-		if (i>0)
-			[s appendString:sep];
-		if ([v isKindOfClass:[NSArray class]]) {
-			NSInteger n2 = [v count];
-			for (int j=0; j<n2; j++) {				
-				if (j>0)
-					[s appendString:sep];
-				if ((NSNull *)v != [NSNull null]) {
-					[s appendFormat:@"%@=%@",k,[[v objectAtIndex:j] description]];
-				}else {
-					[s appendString:k];
-				}
-			}
-		}else {
-			if ((NSNull *)v != [NSNull null]) {
-				[s appendFormat:@"%@=%@",k,[v description]];
-			}else {
-				[s appendString:k];
-			}
-
-		}		
-	}
-	return s;	
-}
-
-+ (NSString *)	serializeURL:(NSString *)url params:(NSDictionary *)param{
-	if (param) {
-		NSString *p = [Utils serializeNetParams:param];
-		if (p && [p length]>0) {
-			url = [NSString stringWithFormat:([url indexOf:@"?"]>=0?@"%@&%@":@"%@?%@"),url,p];
-			//url = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-		}
-	}
-	return [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-}
 + (NSString *)	getChineseWeek:(int)n{
 	if ( n>7 || n<0 ) {
 		NSDateFormatter *df = [[NSDateFormatter alloc] init] ;
@@ -467,110 +354,4 @@ BOOL setAlarm(NSString *key, id userInfo, NSString *msg, NSString *action, NSTim
     cal = nil;
 	return [date timeIntervalSince1970];
 }
-+ (NSDictionary *) parseURL:(NSString *)url withParam:(NSDictionary *)param{
-	NSMutableDictionary *ret = [NSMutableDictionary dictionaryWithCapacity:3];
-	[ret setValue:url forKey:URLParseKeyString];
-	NSString *path = url;
-	
-	NSInteger i = [url indexOf:@"?"];
-	if ( i>0 && i<[url length] ) {
-		path = [url substringToIndex:i];
-		NSMutableDictionary *params = [NSMutableDictionary dictionary];
-		NSString *query = [url substringFromIndex:(i+1)];
-		NSInteger k = [query indexOf:@"#"];
-		//DLOG(@"k:%@,%d",query,k);
-		if (k>=0) {
-			query = [query substringToIndex:k];
-		}
-		
-		NSArray *arr = [query componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"&"]];
-		NSInteger n = [arr count];
-		for (NSInteger j = 0; j<n; j++) {
-			NSString *q = (NSString *)[arr objectAtIndex:j];
-			NSArray *_a = [q split:@"="];
-			if ([_a count]) {
-				NSString *_k = [_a objectAtIndex:0];
-				NSString *_v = [_a count]>1?[_a objectAtIndex:1]:@"";
-				if (param && [_v length]>0) {
-					NSArray *_arr = [_v arrayOfCaptureComponentsMatchedByRegex:PH_REGEXP];
-					if (_arr && [_arr count]>0 && [[_arr objectAtIndex:0] count]==2) {
-						NSString *_k2 = [[_arr objectAtIndex:0] objectAtIndex:1];
-						if ([param valueForKey:_k2]) {
-							_v = [param valueForKey:_k2];
-						}
-					}
-				}
-				[params setValue:_v forKey:_k];
-			}
-		}
-		[ret setValue:params forKey:URLParseKeyParam];	
-	}	
-	i = [path indexOf:@"#"];
-	if(i>=0 && i<[path length]){
-		path = [path substringToIndex:i];
-	}
-	
-	i = [path lastIndexOf:@"/"];
-	NSString *page = @"";
-	if ( i>6 && i<[path length] ) {
-		page = [path substringFromIndex:(i+1)];
-		path = [path substringToIndex:i];
-	}
-	[ret setValue:page forKey:URLParseKeyPage];
-	[ret setValue:path forKey:URLParseKeyPath];
-	[ret setValue:[NSString stringWithFormat:@"%@/%@",path,page] forKey:URLParseKeyUrl];
-	return ret;
-	
-}
-+ (NSString *)	url:(NSString *)url withParam:(NSDictionary *)param{
-	NSMutableDictionary *phParam = [NSMutableDictionary dictionaryWithDictionary:param];
-    NSString *newUrl = url;
-	if (param) {
-		NSArray *arr = [Utils parsePlaceholders:url];
-		if (arr) {
-			for (NSString *k in arr) {
-				NSString *v = [[phParam valueForKey:k] description];
-				if (v) {
-					[phParam removeObjectForKey:k];
-				}else {
-					v = @"";
-				}
-				newUrl = [newUrl stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"{%@}",k] withString:v];
-			}
-		}		
-	}//end if(param);
-	
-	NSDictionary *d = [Utils parseURL:newUrl withParam:nil];
-	NSString *path = [d valueForKey:URLParseKeyPath];
-	NSString *page = [d valueForKey:URLParseKeyPage];
-	newUrl = [page length]>0?[NSString stringWithFormat:@"%@/%@",path,page]:path;
-	NSMutableDictionary *p = [NSMutableDictionary dictionaryWithDictionary:[d valueForKey:URLParseKeyParam]];
-	for (NSString *k in [phParam allKeys]) {
-		[p setValue:[phParam valueForKey:k] forKey:k];
-	}
-	return [Utils serializeURL:newUrl params:p];
-}
-+ (NSArray *)	parsePlaceholders:(NSString *)url{
-	NSArray *_arr = [url arrayOfCaptureComponentsMatchedByRegex:PH_REGEXP];
-	NSMutableArray *_list = nil;
-	if ([_arr count]>0) {
-		_list = [NSMutableArray arrayWithCapacity:[_arr count]];
-		for (NSArray *_a in _arr) {
-			if ([_a  count] == 2) {
-				[_list addObject:[_a objectAtIndex:1]];
-			}
-		}
-	}
-	return _list;
-}
-+ (NSString *) url:(NSString *)url replaceholders:(NSDictionary *)param{
-	NSString *_newURL = url;
-	NSArray *_arr = [Utils parsePlaceholders:url];
-	for (NSString *ph in _arr) {
-		NSString *v = nullToNil( [param valueForKey:ph] );
-		_newURL = [_newURL stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"{%@}",ph] withString:(v?[v description]:@"")];
-	}
-	return _newURL;
-}
-
 @end

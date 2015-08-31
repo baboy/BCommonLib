@@ -88,16 +88,8 @@
 - (BOOL)testRegex:(NSString *)re{
     return [self isMatchedByRegex:re];
 }
-- (BOOL)renameToPath:(NSString *)newPath{
-	NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSError *err = nil;
-	BOOL flag = [fileManager moveItemAtPath:self toPath:newPath error:&err];
-    if (!flag || err) {
-        DLOG(@"error:%@",err);
-    }
-    return flag;
-}
-- (BOOL)copyToPath:(NSString *)newPath{
+#pragma file operation
+- (BOOL)copyFileTo:(NSString *)newPath{
 	NSFileManager *fileManager = [NSFileManager defaultManager];
     NSError *err = nil;
 	BOOL flag = [fileManager copyItemAtPath:self toPath:newPath error:&err];
@@ -123,6 +115,24 @@
     NSDictionary *attrs = [fileManager attributesOfItemAtPath:self error: NULL];
     return [attrs fileSize];
 }
+
+- (BOOL)fileExists{
+    return [[NSFileManager defaultManager] fileExistsAtPath:self];
+}
+- (BOOL)renameFileTo:(NSString *)to{
+    if ([self isEqualToString:to]) {
+        return YES;
+    }
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSError *err = nil;
+    BOOL flag = [fileManager moveItemAtPath:self toPath:to error:&err];
+    if (!flag || err) {
+        DLOG(@"error:%@",err);
+    }
+    return flag;
+}
+
+
 - (id)json{
     NSData *data = [self dataUsingEncoding:NSUTF8StringEncoding];
     NSError *err = nil;
@@ -165,9 +175,6 @@
         }
     }
     return  ceil(number);
-}
-- (BOOL)fileExists{
-    return [[NSFileManager defaultManager] fileExistsAtPath:self];
 }
 - (NSString *)pinyin{
     NSMutableString *newStr = [NSMutableString stringWithString:self];

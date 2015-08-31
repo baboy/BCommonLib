@@ -8,6 +8,9 @@
 
 #import "AppContext.h"
 #import "BCommonLibDao.h"
+#import "Utils.h"
+#import "NSString+x.h"
+#import "Global.h"
 
 @implementation AppContext
 
@@ -22,5 +25,22 @@
 }
 + (NSString *) deviceToken{
     return [DBCache valueForKey:@"device_token"];
+}
+@end
+
+@implementation AppCache
++ (NSString *) cachePath:(NSString *)fn{
+    if ([fn isURL]) {
+        fn = [NSString stringWithFormat:@"%@.%@",[fn md5],[fn pathExtension]];
+    }
+    if([fn fileExists]){
+        return fn;
+    }
+    NSString *fp = getFilePath(FILE_CACHE_DIR, fn, nil);
+    return fp;
+}
++ (NSString *) crateCachePathWithExtension:(NSString *)ext{
+    NSString *fn = [NSString stringWithFormat:@"%@.%@",[[NSUUID UUID] UUIDString], ext];
+    return [self cachePath:fn];
 }
 @end

@@ -7,6 +7,7 @@
 //
 
 #import "BMapPlace.h"
+#import "NSString+x.h"
 #import "Utils.h"
 #import "BApi.h"
 
@@ -55,7 +56,7 @@
     return d;
 }
 + (BHttpRequestOperation *)search:(NSString *)location callback:(void (^)(BHttpRequestOperation *operation,NSArray *locs, NSError *error))callback{
-    NSString *url = [Utils url:ApiQueryLocation withParam:@{@"loc":location}];
+    NSString *url = [ApiQueryLocation URLStringWithParam:@{@"loc":location}];
     return [[BHttpRequestManager defaultManager]
      jsonRequestOperationWithGetRequest:url
      parameters:nil

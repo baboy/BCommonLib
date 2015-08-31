@@ -22,37 +22,61 @@
 
 - (BHttpRequestOperation *)createHttpRequestOperationWithRequest:(NSURLRequest *)request
                                               responseSerializer:(AFHTTPResponseSerializer *)responseSerializer
-                                                        callback:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache,NSError *error)) callback
+                                                        success:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache)) success
+                                                         failure:(void (^)(BHttpRequestOperation *operation, NSError *error)) failure
+                                                        progress:(void (^)(id operation,long long totalBytesRead, long long totalBytesExpectedToRead))progressBlock
 {
     BHttpRequestOperation *operation = [[BHttpRequestOperation alloc] initWithRequest:request];
-    operation.responseSerializer = responseSerializer;
+    operation.responseSerializer = responseSerializer?:operation.responseSerializer;
     operation.shouldUseCredentialStorage = self.shouldUseCredentialStorage;
     operation.credential = self.credential;
     operation.securityPolicy = self.securityPolicy;
     [operation setCompletionBlockWithSuccess:^(id operation, id responseObject) {
         bool readFromCache = [operation isReadFromCache];
-        callback(operation,responseObject,readFromCache,nil);
+        success(operation,responseObject,readFromCache);
     } failure:^(id operation, NSError *error) {
-        callback(operation,nil, false,error);
+        failure(operation,error);
     }];
     operation.completionQueue = self.completionQueue;
     operation.completionGroup = self.completionGroup;
-    
+    __weak id ope = operation;
+    [operation setDownloadProgressBlock:^(NSUInteger bytesRead, long long totalBytesRead, long long totalBytesExpectedToRead) {
+        if(progressBlock){
+            progressBlock(ope, totalBytesRead, totalBytesExpectedToRead);
+        }
+    }];
     return operation;
+}
+- (BHttpRequestOperation *)createHttpRequestOperationWithRequest:(NSURLRequest *)request
+                                              responseSerializer:(AFHTTPResponseSerializer *)responseSerializer
+                                                         success:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache)) success
+                                                         failure:(void (^)(BHttpRequestOperation *operation, NSError *error)) failure
+{
+    return [self createHttpRequestOperationWithRequest:request
+                                    responseSerializer:responseSerializer
+                                               success:success
+                                               failure:failure
+                                              progress:nil
+            ];
+    
 }
 
 - (BHttpRequestOperation *)createDefaultHttpRequestOperationWithRequest:(NSURLRequest *)request
-                                                               callback:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache,NSError *error)) callback{
+                                                                success:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache)) success
+                                                                failure:(void (^)(BHttpRequestOperation *operation, NSError *error)) failure{
     return [self createHttpRequestOperationWithRequest:request
                                     responseSerializer:[AFHTTPResponseSerializer serializer]
-                                               callback:callback];
+                                               success:success
+                                               failure:failure];
 }
 - (BHttpRequestOperation *)createJsonHttpRequestOperationWithRequest:(NSURLRequest *)request
-                                                            callback:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache,NSError *error)) callback{
+                                                             success:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache)) success
+                                                             failure:(void (^)(BHttpRequestOperation *operation, NSError *error)) failure{
     [self.responseSerializer setAcceptableContentTypes:nil];
     return [self createHttpRequestOperationWithRequest:request
                                     responseSerializer:self.responseSerializer
-                                               callback:callback];
+                                               success:success
+                                                      failure:failure];
 }
 
 
@@ -72,10 +96,11 @@
                                                    parameters:(id)parameters
                                                      userInfo:(id)userInfo
                                                   cachePolicy:(BHttpRequestCachePolicy)cachePolicy
-                                                      callback:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache,NSError *error)) callback
+                                                      success:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache)) success
+                                                      failure:(void (^)(BHttpRequestOperation *operation, NSError *error)) failure
 {
     NSMutableURLRequest *request = [self requestWithGETURL:URLString parameters:parameters];
-    BHttpRequestOperation *operation = [self createJsonHttpRequestOperationWithRequest:request callback:callback];
+    BHttpRequestOperation *operation = [self createJsonHttpRequestOperationWithRequest:request success:success failure:failure];
     [operation setUserInfo:userInfo];
     [operation setCacheHandler:[BHttpRequestCacheHandler handlerWithCachePolicy:cachePolicy]];
     [self.operationQueue addOperation:operation];
@@ -86,24 +111,30 @@
 - (BHttpRequestOperation *)jsonRequestOperationWithGetRequest:(NSString *)URLString
                                                    parameters:(id)parameters
                                                   cachePolicy:(BHttpRequestCachePolicy)cachePolicy
-                                                     callback:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache,NSError *error)) callback{
-    return [self jsonRequestOperationWithGetRequest:URLString parameters:parameters userInfo:nil cachePolicy:cachePolicy callback:callback];
+                                                      success:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache)) success
+                                                      failure:(void (^)(BHttpRequestOperation *operation, NSError *error)) failure{
+    return [self jsonRequestOperationWithGetRequest:URLString parameters:parameters userInfo:nil cachePolicy:cachePolicy success:success failure:failure];
 }
 
 - (BHttpRequestOperation *)jsonRequestOperationWithGetRequest:(NSString *)URLString
                                                    parameters:(id)parameters
-                                                      callback:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache,NSError *error)) callback{
-    return [self jsonRequestOperationWithGetRequest:URLString parameters:parameters userInfo:nil cachePolicy:BHttpRequestCachePolicyNone callback:callback];
+                                                      success:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache)) success
+                                                      failure:(void (^)(BHttpRequestOperation *operation, NSError *error)) failure{
+    return [self jsonRequestOperationWithGetRequest:URLString parameters:parameters userInfo:nil cachePolicy:BHttpRequestCachePolicyNone  success:success failure:failure];
 }
 //post json
 - (AFHTTPRequestOperation *)jsonRequestOperationWithPostRequest:(NSString *)URLString
                                                      parameters:(id)parameters
                                                        userInfo:(id)userInfo
                                                     cachePolicy:(BHttpRequestCachePolicy)cachePolicy
-                                                        callback:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache,NSError *error)) callback
+                                                        success:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache)) success
+                                                        failure:(void (^)(BHttpRequestOperation *operation, NSError *error)) failure
 {
-    NSMutableURLRequest *request = [self requestWithPOSTURL:URLString parameters:parameters];
-    BHttpRequestOperation *operation = [self createJsonHttpRequestOperationWithRequest:request callback:callback];
+    NSMutableURLRequest *request = [self requestWithPOSTURL:URLString parameters:([parameters isKindOfClass:[NSDictionary class]] ? parameters : nil)];
+    if (![parameters isKindOfClass:[NSDictionary class]]) {
+        [request setHTTPBody:[parameters dataUsingEncoding:NSUTF8StringEncoding]];
+    }
+    BHttpRequestOperation *operation = [self createJsonHttpRequestOperationWithRequest:request  success:success failure:failure];
     [operation setUserInfo:userInfo];
     [operation setCacheHandler:[BHttpRequestCacheHandler handlerWithCachePolicy:cachePolicy]];
     [self.operationQueue addOperation:operation];
@@ -113,23 +144,26 @@
 - (AFHTTPRequestOperation *)jsonRequestOperationWithPostRequest:(NSString *)URLString
                                                      parameters:(id)parameters
                                                     cachePolicy:(BHttpRequestCachePolicy)cachePolicy
-                                                        callback:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache,NSError *error)) callback{
-    return [self jsonRequestOperationWithPostRequest:URLString parameters:parameters userInfo:nil cachePolicy:cachePolicy callback:callback];
+                                                        success:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache)) success
+                                                        failure:(void (^)(BHttpRequestOperation *operation, NSError *error)) failure{
+    return [self jsonRequestOperationWithPostRequest:URLString parameters:parameters userInfo:nil cachePolicy:cachePolicy  success:success failure:failure];
 }
 
 - (AFHTTPRequestOperation *)jsonRequestOperationWithPostRequest:(NSString *)URLString
                                                      parameters:(id)parameters
-                                                       callback:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache,NSError *error)) callback{
-    return [self jsonRequestOperationWithPostRequest:URLString parameters:parameters userInfo:nil cachePolicy:BHttpRequestCachePolicyNone callback:callback];
+                                                        success:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache)) success
+                                                        failure:(void (^)(BHttpRequestOperation *operation, NSError *error)) failure{
+    return [self jsonRequestOperationWithPostRequest:URLString parameters:parameters userInfo:nil cachePolicy:BHttpRequestCachePolicyNone  success:success failure:failure];
 }
 // data json
 - (BHttpRequestOperation *)dataRequestWithURLRequest:(NSString *)URLString
                                           parameters:(id)parameters
                                             userInfo:(id)userInfo
                                          cachePolicy:(BHttpRequestCachePolicy)cachePolicy
-                                             callback:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache,NSError *error)) callback{
+                                             success:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache)) success
+                                             failure:(void (^)(BHttpRequestOperation *operation, NSError *error)) failure{
     NSMutableURLRequest *request = [self requestWithPOSTURL:URLString parameters:parameters];
-    BHttpRequestOperation *operation = [self createJsonHttpRequestOperationWithRequest:request callback:callback];
+    BHttpRequestOperation *operation = [self createJsonHttpRequestOperationWithRequest:request  success:success failure:failure];
     [operation setUserInfo:userInfo];
     [operation setCacheHandler:[BHttpRequestCacheHandler handlerWithCachePolicy:cachePolicy]];
     [self.operationQueue addOperation:operation];
@@ -138,8 +172,9 @@
 }
 - (BHttpRequestOperation *)dataRequestWithURLRequest:(NSString *)URLString
                                           parameters:(id)parameters
-                                             callback:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache,NSError *error)) callback{
-    return [self dataRequestWithURLRequest:URLString parameters:parameters userInfo:nil cachePolicy:BHttpRequestCachePolicyNone callback:callback];
+                                             success:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache)) success
+                                             failure:(void (^)(BHttpRequestOperation *operation, NSError *error)) failure{
+    return [self dataRequestWithURLRequest:URLString parameters:parameters userInfo:nil cachePolicy:BHttpRequestCachePolicyNone success:success failure:failure];
 }
 
 // file request
@@ -147,19 +182,52 @@
                                           parameters:(id)parameters
                                             userInfo:(id)userInfo
                                          cachePolicy:(BHttpRequestCachePolicy)cachePolicy
-                                             callback:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache,NSError *error)) callback{
+                                             success:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache)) success
+                                             failure:(void (^)(BHttpRequestOperation *operation, NSError *error)) failure{
     NSMutableURLRequest *request = [self requestWithPOSTURL:URLString parameters:parameters];
-    BHttpRequestOperation *operation = [self createDefaultHttpRequestOperationWithRequest:request callback:callback];
+    BHttpRequestOperation *operation = [self createDefaultHttpRequestOperationWithRequest:request success:success failure:failure];
     [operation setCacheHandler:[BHttpRequestCacheHandler handlerWithCachePolicy:cachePolicy]];
     [self.operationQueue addOperation:operation];
     
     return operation;
 }
 - (BHttpRequestOperation *)cacheFileRequestWithURLRequest:(NSString *)URLString
-                                          parameters:(id)parameters
-                                             callback:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache,NSError *error)) callback{
-    return [self fileRequestWithURLRequest:URLString parameters:parameters userInfo:nil cachePolicy:BHttpRequestCachePolicyLoadIfNotCached callback:callback];
+                                               parameters:(id)parameters
+                                                  success:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache)) success
+                                                  failure:(void (^)(BHttpRequestOperation *operation, NSError *error)) failure{
+    return [self fileRequestWithURLRequest:URLString parameters:parameters userInfo:nil cachePolicy:BHttpRequestCachePolicyLoadIfNotCached success:success failure:failure];
 }
 
+
+- (BHttpRequestOperation *)downloadFileWithURLRequest:(NSString *)URLString
+                                           parameters:(id)parameters
+                                             userInfo:(id)userInfo
+                                          cachePolicy:(BHttpRequestCachePolicy)cachePolicy
+                                              success:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache)) success
+                                              failure:(void (^)(BHttpRequestOperation *operation, NSError *error)) failure
+                                             progress:(void (^)(id operation,long long totalBytesRead, long long totalBytesExpectedToRead))progressBlock{
+    NSMutableURLRequest *request = [self requestWithGETURL:URLString parameters:parameters];
+    BHttpRequestOperation *operation =
+    [self createHttpRequestOperationWithRequest:request
+                             responseSerializer:[AFHTTPResponseSerializer serializer]
+                                        success:^(BHttpRequestOperation *operation, id data, bool isReadFromCache) {
+                                            if(success){
+                                                NSString *fp = [operation cacheFilePath];
+                                                success(operation,fp, [operation isReadFromCache]);
+                                            }
+                                            
+                                        }
+                                        failure:^(BHttpRequestOperation *operation, NSError *error) {
+                                            if (failure) {
+                                                failure(operation, error);
+                                            }
+                                        }
+                                       progress:progressBlock];
+    [operation setCacheHandler:[BHttpRequestCacheHandler handlerWithCachePolicy:cachePolicy]];
+    operation.userInfo = userInfo;
+    [self.operationQueue addOperation:operation];
+    return operation;
+    
+}
 
 @end

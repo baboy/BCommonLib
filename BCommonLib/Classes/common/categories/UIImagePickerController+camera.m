@@ -10,6 +10,8 @@
 #import "Global.h"
 #import "Utils.h"
 #import "BCommonLibCategories.h"
+#import "NSString+x.h"
+#import "AppContext.h"
 
 @implementation UIImagePickerController(camera)
 + (UIImagePickerController *)imagePickerWithSourceType:(UIImagePickerControllerSourceType)sourceType mediaTypes:(NSArray *)mediaTypes{
@@ -19,7 +21,7 @@
     if(sourceType == UIImagePickerControllerSourceTypeCamera){
         picker.showsCameraControls = YES;
     }
-    picker.navigationBar.barStyle = UIBarStyleBlack;
+    //picker.navigationBar.barStyle = UIBarStyleBlack;
     picker.mediaTypes = mediaTypes;
     
     for (NSString *mediaType in mediaTypes) {
@@ -71,41 +73,19 @@
     }
     return thumbnailPath;
 }
-+ (NSString *)saveVideoFromMediaInfo:(NSDictionary*)info{
-    NSString *fp = nil;
++ (BOOL)saveVideoTo:(NSString *)fp fromMediaInfo:(NSDictionary*)info{
     NSURL *videoURL = [info valueForKey:UIImagePickerControllerMediaURL];
-    @try{
-        NSString *fn = [Utils format:@"yyyyMMddhhmmss" time:[[NSDate date] timeIntervalSince1970]];
-        NSString *ext = [videoURL pathExtension];
-        NSString *path = [Utils getFilePath:fn ext:ext inDir:gImageCacheDir];
-        NSString *string= [videoURL path];
-        fp = [Utils moveFile:string toFile:path]?path:nil;
-    }
-    @catch (NSException *e){
-        NSLog(@"create thumbnail exception.");
-    }
-    return fp;
+    return [[videoURL path] renameFileTo:fp];
 }
-+ (NSString *)savePhotoFromMediaInfo:(NSDictionary*)info{
++ (BOOL)savePhotoTo:(NSString *)fp fromMediaInfo:(NSDictionary*)info{
     UIImage *image = [info valueForKey:UIImagePickerControllerEditedImage];
     if (!image)
-        [info valueForKey:UIImagePickerControllerOriginalImage];
+        image = [info valueForKey:UIImagePickerControllerOriginalImage];
     
     if (![info valueForKey:UIImagePickerControllerReferenceURL]) {
         UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);
     }
-    NSData *data = UIImageJPEGRepresentation([image fixOrientation], 0);
-    NSString *fp = nil;
-    @try{
-        NSString *fn = [Utils format:@"yyyyMMddhhmmss" time:[[NSDate date] timeIntervalSince1970]];
-        NSString *path = [Utils getFilePath:fn ext:@"jpg" inDir:gImageCacheDir];
-        fp = [data writeToFile:path atomically:YES]?path:nil;
-    }
-    @catch (NSException *e){
-        NSLog(@"create thumbnail exception.");
-    }
-    
-    return fp;
+    return [image saveTo:fp];
 }
 @end
 
@@ -148,4 +128,68 @@
         
     }
 }
+@end
+
+@interface CameraCapture()<UIImagePickerControllerDelegate,UINavigationControllerDelegate>
+
+@end
+@implementation CameraCapture
+
+
+- (UIImagePickerController *)captureFromController:(UIViewController *)vc
+               withSourceType:(UIImagePickerControllerSourceType)sourceType
+               withMediaTypes:(NSArray *)mediaTypes{
+    UIImagePickerController *picker = [UIImagePickerController imagePickerWithSourceType:sourceType mediaTypes:mediaTypes];
+    picker.delegate = self;
+    if(vc){
+        [vc presentViewController:picker animated:YES completion:^{
+            
+        }];
+    }
+    return picker;
+    
+}
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+    if (info) {
+        NSString *src = nil;
+        NSString *thumbnail = nil;
+        NSString *mediaType = [info valueForKey:UIImagePickerControllerMediaType];
+        if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
+            DLOG(@"select Image");
+            
+            src = [AppCache cachePath:[NSString stringWithFormat:@"%@.%@",[[NSUUID UUID] UUIDString], @"jpg"]];
+            [UIImagePickerController savePhotoTo:src fromMediaInfo:info];
+            if ([src fileExists]) {
+                thumbnail = [AppCache cachePath:[NSString stringWithFormat:@"%@.%@",[[NSUUID UUID] UUIDString], @"jpg"]];
+                [UIImageJPEGRepresentation([UIImage imageWithContentsOfFile:src], 0.5) writeToFile:thumbnail atomically:YES];
+            }
+            if (self.delegate && [self.delegate respondsToSelector:@selector(cameraCapture:didCaptureMedia:withThumbnail:)]) {
+                [self.delegate cameraCapture:self didCaptureMedia:src withThumbnail:thumbnail];
+            }
+        } else {
+            DLOG(@"select movie");
+            
+            NSString *mov = [AppCache cachePath:[NSString stringWithFormat:@"%@.%@",[[NSUUID UUID] UUIDString], @"MOV"]];
+            [UIImagePickerController saveVideoTo:mov fromMediaInfo:info];
+            thumbnail = [UIImagePickerController thumbnailPathOfVideo:mov];
+            
+            //__weak id capture = self;
+            NSString *mp4 = [AppCache cachePath:[NSString stringWithFormat:@"%@.%@",[[NSUUID UUID] UUIDString], @"mp4"]];
+            [VideoUtils convertVideoFromMov:mov toMp4:mp4 withCallback:^(AVAssetExportSession *exportSession, NSError *error) {
+                [mov deleteFile];
+                if(error){
+                    if (self.delegate && [self.delegate respondsToSelector:@selector(cameraCapture:didCaptureWithError:)]) {
+                        [self.delegate cameraCapture:self didCaptureWithError:error];
+                    }
+                }else if (self.delegate && [self.delegate respondsToSelector:@selector(cameraCapture:didCaptureMedia:withThumbnail:)]) {
+                    [self.delegate cameraCapture:self didCaptureMedia:mp4 withThumbnail:thumbnail];
+                }
+            }];
+        }
+    }
+    [picker dismissViewControllerAnimated:YES completion:^{
+        
+    }];
+}
+
 @end

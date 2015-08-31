@@ -12,7 +12,7 @@
 #import <objc/message.h>
 #import "BCommonLibCategories.h"
 
-#define  DebugLog(...) NSLog(@"[DEBUG][%s] - [line:%d] %@",__func__, __LINE__, [NSString stringWithFormat:__VA_ARGS__]);
+#define  DebugLog(...) //NSLog(@"[DEBUG][%s] - [line:%d] %@",__func__, __LINE__, [NSString stringWithFormat:__VA_ARGS__]);
 
 @implementation Model
 - (id) initWithDictionary:(NSDictionary *)dict{
@@ -73,7 +73,11 @@
 //        IMP imp = [self methodForSelector:action];
 //        id (*_propValue)() = (void *)imp;
 //        id val = _propValue(self, action);
-        if ([val respondsToSelector:@selector(dict)]) {
+        if ([val isKindOfClass:[NSArray class]]) {
+            val = [val json];
+        }else if ([val isKindOfClass:[NSDictionary class]]){
+            val = [val json];
+        }else if ([val respondsToSelector:@selector(dict)]) {
             val = [val dict];
         }
         if (val)
@@ -217,8 +221,11 @@
                     }else{
                         v = [val dateWithFormat:FULLDATEFORMAT];
                     }
-                }else if ([className isEqualToString:@"NSDictionary"]) {
-                    v = /*AUTORELEASE*/([[NSClassFromString(className) alloc] initWithDictionary:val]);
+                }else if ([NSClassFromString(className) isSubclassOfClass:[NSDictionary class]]) {
+                    if ([val isKindOfClass:[NSString class]]) {
+                        v = [v json];
+                    }
+                    v = /*AUTORELEASE*/([[NSClassFromString(className) alloc] initWithDictionary:v]);
                 }else if([NSClassFromString(className) isSubclassOfClass:[Model class]]){
                     v = /*AUTORELEASE*/([[NSClassFromString(className) alloc] initWithDictionary:val]);
                 }

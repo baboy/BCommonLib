@@ -66,7 +66,7 @@ static id _current_user = nil;
             [[NSNotificationCenter defaultCenter] postNotificationName:NotificationUserWillChange object:nil];
         }
         NSString *data = [[user dict] jsonString];
-        DLOG(@"%@", data);
+        //DLOG(@"%@", data);
         if (data) {
             [DBCache setValue:data forKey:@"USER"];
             [DBCache setValue:NSStringFromClass([user class]) forKey:@"USER_CLASS"];

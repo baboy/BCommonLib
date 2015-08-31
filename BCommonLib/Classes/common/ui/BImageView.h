@@ -17,10 +17,10 @@ typedef enum {
 @interface BImageView : XUIView 
 @property (nonatomic, assign) id target;
 @property (nonatomic, assign) SEL action;
-@property (nonatomic, retain) UIImageView *imgView;
+@property (nonatomic, retain) UIButton *button;
 @property (nonatomic, retain) UILabel *titleLabel;
 
-@property (nonatomic, retain) NSObject *object;
+@property (nonatomic, strong) id userInfo;
 
 @property (nonatomic, assign) CGFloat padding;
 
