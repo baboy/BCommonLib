@@ -10,6 +10,7 @@
 #import "BHttpRequestManager.h"
 
 @interface BHttpRequestManager(Deprecated)
+/*
 - (BHttpRequestOperation *)jsonRequestOperationWithGetRequest:(NSString *)URLString
                                                    parameters:(id)parameters
                                                      userInfo:(id)userInfo
@@ -51,4 +52,5 @@
                                           parameters:(id)parameters
                                              success:(void (^)(BHttpRequestOperation *operation, id data))success
                                              failure:(void (^)(BHttpRequestOperation *operation, NSError *error))failure;
+ */
 @end

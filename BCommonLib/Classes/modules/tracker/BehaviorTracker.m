@@ -40,7 +40,7 @@ static NSString *LogSessionID = nil;
     return [[BHttpRequestManager defaultManager]
             jsonRequestOperationWithPostRequest:url
             parameters:params
-            success:^(BHttpRequestOperation *operation, id json) {
+            success:^(BHttpRequestOperation *operation, id json, bool isReadFromCache) {
                 if (callback) {
                     callback(operation, json,nil);
                 }

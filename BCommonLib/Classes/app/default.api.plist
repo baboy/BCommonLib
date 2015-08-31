@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>server</key>
-	<string>http://app.tvie.com.cn</string>
+	<string></string>
 	<key>app_conf</key>
 	<string></string>
 	<key>api_splash</key>

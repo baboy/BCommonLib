@@ -60,7 +60,7 @@
     return [[BHttpRequestManager defaultManager]
      jsonRequestOperationWithGetRequest:url
      parameters:nil
-     success:^(BHttpRequestOperation *operation, id json) {
+     success:^(BHttpRequestOperation *operation, id json, bool isReadFromCache) {
          HttpResponse *response = [HttpResponse responseWithDictionary:json];
          NSMutableArray *addrs = nil;
          NSError *error = response.error;

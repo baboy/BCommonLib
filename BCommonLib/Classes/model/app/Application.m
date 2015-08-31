@@ -59,7 +59,7 @@
     return [[BHttpRequestManager defaultManager]
             jsonRequestOperationWithGetRequest:ApiQueryAppList
             parameters:param
-            success:^(BHttpRequestOperation *operation, id json) {
+            success:^(BHttpRequestOperation *operation, id json, bool isReadFromCache) {
                 DLOG(@"json = %@",json);
                 NSError *error = nil;
                 NSArray *groups = nil;
@@ -98,7 +98,7 @@
     return [[BHttpRequestManager defaultManager]
             dataRequestWithURLRequest:ApiQueryAbout
             parameters:param
-            success:^(BHttpRequestOperation *operation, id data) {
+            success:^(BHttpRequestOperation *operation, id data, bool isReadFromCache) {
                 id ret = nil;
                 id error = nil;
                 if ([output isEqualToString:@"json"]) {
@@ -133,7 +133,7 @@
     return [[BHttpRequestManager defaultManager]
             jsonRequestOperationWithPostRequest:ApiPostFeedback
             parameters:param
-            success:^(BHttpRequestOperation *operation, id json) {
+            success:^(BHttpRequestOperation *operation, id json, bool isReadFromCache) {
                 HttpResponse *response = [HttpResponse responseWithDictionary:json];
                 if ([response isSuccess]) {
                     if (callback) {
@@ -179,7 +179,7 @@
     return [[BHttpRequestManager defaultManager]
             jsonRequestOperationWithGetRequest:ApiQueryAppVersion
             parameters:param
-            success:^(BHttpRequestOperation *operation, id json) {
+            success:^(BHttpRequestOperation *operation, id json, bool isReadFromCache) {
                 DLOG(@"json = %@",json);
                 NSError *error = nil;
                 ApplicationVersion *app = nil;
@@ -211,7 +211,7 @@
     return [[BHttpRequestManager defaultManager]
             jsonRequestOperationWithPostRequest:ApiRegisterDeviceToken
             parameters:param
-            success:^(BHttpRequestOperation *operation, id json) {
+            success:^(BHttpRequestOperation *operation, id json, bool isReadFromCache) {
                 HttpResponse *respone = [HttpResponse responseWithDictionary:json];
                 if (callback) {
                     callback(operation, [respone data], [respone error]);

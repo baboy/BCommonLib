@@ -47,10 +47,10 @@
         return;
     }
     [[BHttpRequestManager defaultManager]
-     fileRequestWithURLRequest:url
+     cacheFileRequestWithURLRequest:url
      parameters:nil
      userInfo:@{@"object":self, @"state":[NSNumber numberWithInt:state]}
-     success:^(BHttpRequestOperation *operation, id data) {
+     success:^(BHttpRequestOperation *operation, id data, bool isReadFromCache) {
          NSDictionary *userInfo = [operation userInfo];
          id object = userInfo?[userInfo valueForKey:@"object"]:nil;
          NSString *fp = [operation cacheFilePath];

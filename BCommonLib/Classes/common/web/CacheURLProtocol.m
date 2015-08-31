@@ -44,16 +44,15 @@
     }
     BHttpRequestOperation *operation =
     [[BHttpRequestManager defaultManager]
-     fileRequestWithURLRequest:urlString
+     cacheFileRequestWithURLRequest:urlString
      parameters:nil
-     success:^(BHttpRequestOperation *operation, id data) {
+     success:^(BHttpRequestOperation *operation, id data, bool isReadFromCache) {
          data = [operation responseData];
          [self.client URLProtocol:self didLoadData:data];
          [self.client URLProtocolDidFinishLoading:self];
      }
      failure:^(BHttpRequestOperation *operation, NSError *error) {
-         
-         [self.client URLProtocol:self didFailWithError:error];
+          [self.client URLProtocol:self didFailWithError:error];
      }];
     self.cacheOperation = operation;
 }

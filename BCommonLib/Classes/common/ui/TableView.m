@@ -105,19 +105,20 @@
     NSString *url = [imgURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     DLOG(@"loadImg:%@",url);
     BHttpRequestManager * requestManager = [BHttpRequestManager defaultManager];
-    [requestManager fileRequestWithURLRequest:url
-                                   parameters:nil
-                                      success:^(BHttpRequestOperation *operation, id data) {
-                                          if (self && [self isKindOfClass:[TableView class]]) {
-                                              NSString *fp = operation.cacheFilePath;
-                                              
-                                              NSIndexPath *indexPath = [[operation userInfo] valueForKey:@"indexPath"];
-                                              [self setImagePath:fp forURL:operation.request.URL forIndexPath:indexPath];
-                                          }
-                                      }
-                                      failure:^(BHttpRequestOperation *operation, NSError *error) {
-                                          DLOG(@"[TableView] loadImage fail:%@",error);
-                                      }];
+    [requestManager cacheFileRequestWithURLRequest:url
+                                        parameters:nil
+                                           success:^(BHttpRequestOperation *operation, id data, bool isReadFromCache) {
+                                               if (self && [self isKindOfClass:[TableView class]]) {
+                                                   NSString *fp = operation.cacheFilePath;
+                                                   
+                                                   NSIndexPath *indexPath = [[operation userInfo] valueForKey:@"indexPath"];
+                                                   [self setImagePath:fp forURL:operation.request.URL forIndexPath:indexPath];
+                                               }
+                                           }
+                                           failure:^(BHttpRequestOperation *operation, NSError *error) {
+                                               DLOG(@"[TableView] loadImage fail:%@",error);
+                                               
+                                           } ];
     
 }
 - (void)setImagePath:(NSString *)fp forURL:(NSURL *)url forIndexPath:(NSIndexPath *)indexPath{

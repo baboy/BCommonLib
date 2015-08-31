@@ -198,6 +198,13 @@
     return [self fileRequestWithURLRequest:URLString parameters:parameters userInfo:nil cachePolicy:BHttpRequestCachePolicyLoadIfNotCached success:success failure:failure];
 }
 
+- (BHttpRequestOperation *)cacheFileRequestWithURLRequest:(NSString *)URLString
+                                               parameters:(id)parameters
+                                                 userInfo:(id)userInfo
+                                                  success:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache)) success
+                                                  failure:(void (^)(BHttpRequestOperation *operation, NSError *error)) failure{
+    return [self fileRequestWithURLRequest:URLString parameters:parameters userInfo:userInfo cachePolicy:BHttpRequestCachePolicyLoadIfNotCached success:success failure:failure];
+}
 
 - (BHttpRequestOperation *)downloadFileWithURLRequest:(NSString *)URLString
                                            parameters:(id)parameters

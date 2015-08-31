@@ -95,7 +95,7 @@ static id _current_user = nil;
     return [[BHttpRequestManager defaultManager]
             jsonRequestOperationWithPostRequest:ApiLogin
             parameters:params
-            success:^(BHttpRequestOperation *operation, id responseObject) {
+            success:^(BHttpRequestOperation *operation, id responseObject, bool isReadFromCache) {
                 
             }
             failure:^(BHttpRequestOperation *operation, NSError *error) {
@@ -108,7 +108,7 @@ static id _current_user = nil;
     return [[BHttpRequestManager defaultManager]
            jsonRequestOperationWithPostRequest:ApiRegister
            parameters:params
-           success:^(BHttpRequestOperation *operation, id responseObject) {
+           success:^(BHttpRequestOperation *operation, id responseObject, bool isReadFromCache) {
                
            }
            failure:^(BHttpRequestOperation *operation, NSError *error) {

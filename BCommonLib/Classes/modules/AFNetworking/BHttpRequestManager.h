@@ -86,6 +86,11 @@
                                                parameters:(id)parameters
                                                   success:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache)) success
                                                   failure:(void (^)(BHttpRequestOperation *operation, NSError *error)) failure;
+- (BHttpRequestOperation *)cacheFileRequestWithURLRequest:(NSString *)URLString
+                                               parameters:(id)parameters
+                                                 userInfo:(id)userInfo
+                                                  success:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache)) success
+                                                  failure:(void (^)(BHttpRequestOperation *operation, NSError *error)) failure;
 
 
 

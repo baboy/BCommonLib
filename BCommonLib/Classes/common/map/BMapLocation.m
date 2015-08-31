@@ -92,7 +92,7 @@
     return [[BHttpRequestManager defaultManager]
      jsonRequestOperationWithGetRequest:@"http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json"
      parameters:nil
-     success:^(BHttpRequestOperation *operation, id json) {
+     success:^(BHttpRequestOperation *operation, id json, bool isReadFromCache) {
          BMapLocation *loc = nil;
          if (json) {
              loc = [[BMapLocation alloc] init];
@@ -114,7 +114,7 @@
     return [[BHttpRequestManager defaultManager]
      jsonRequestOperationWithGetRequest:url
      parameters:nil
-     success:^(BHttpRequestOperation *operation, id json) {
+     success:^(BHttpRequestOperation *operation, id json, bool isReadFromCache) {
          HttpResponse *response = [HttpResponse responseWithDictionary:json];
          NSMutableArray *addrs = nil;
          NSError *error = nil;

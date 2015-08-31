@@ -9,6 +9,7 @@
 #import "BHttpRequestManager+Deprecated.h"
 
 @implementation BHttpRequestManager(Deprecated)
+/*
 - (BHttpRequestOperation *)createDefaultHttpRequestOperationWithRequest:(NSURLRequest *)request
                                                                 success:(void (^)(BHttpRequestOperation *operation, id responseObject))success
                                                                 failure:(void (^)(BHttpRequestOperation *operation, NSError *error))failure{
@@ -110,4 +111,5 @@
                                              failure:(void (^)(BHttpRequestOperation *operation, NSError *error))failure{
     return [self fileRequestWithURLRequest:URLString parameters:parameters userInfo:nil success:success failure:failure];
 }
+*/
 @end
