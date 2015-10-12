@@ -82,7 +82,7 @@ static id _current_user = nil;
 + (void)logout{
     [DBCache removeForKey:@"USER"];
     if (_current_user) {
-        ////
+        _current_user = nil;
         [[NSNotificationCenter defaultCenter] postNotificationName:NotifyLogout object:nil];
     }
 }
