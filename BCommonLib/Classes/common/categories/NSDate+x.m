@@ -43,11 +43,11 @@
         return [NSString stringWithFormat:NSLocalizedString(@"%d分钟前", nil), t];
     }
     if (t < 3600*24) {
-        t = t/3600*24;
+        t = t/3600;
         return [NSString stringWithFormat:NSLocalizedString(@"%d小时前", nil), t];
     }
     if (t < (3600*24 * 7)) {
-        t = t/3600*24;
+        t = t/(3600*24);
         return [NSString stringWithFormat:NSLocalizedString(@"%d天前", nil), t];
     }
     if ([[self format:@"yyyy"] isEqualToString:[[NSDate date] format:@"yyyy"]]) {
