@@ -19,9 +19,9 @@ typedef enum {
 @property (nonatomic, assign) SEL action;
 @property (nonatomic, retain) UIButton *button;
 @property (nonatomic, retain) UILabel *titleLabel;
-
+@property (nonatomic, retain) NSString *imageURL;
 @property (nonatomic, strong) id userInfo;
-
+@property (nonatomic, retain) NSObject *object;
 @property (nonatomic, assign) CGFloat padding;
 
 @property (nonatomic, assign) BImageTitleStyle titleStyle;
