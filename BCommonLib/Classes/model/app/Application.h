@@ -31,16 +31,14 @@ typedef NSInteger AppUpdateRole;
 - (id)initWithDictionary:(NSDictionary *)dic;
 + (NSArray *)appsFromArray:(NSArray *)array;
 
-//获取应用推荐列表
-+ (BHttpRequestOperation *)getAppListCallback:(void(^)(BHttpRequestOperation *operation, NSArray *response, NSError *error))callback;
+#pragma mark -- 请求应用列表
++ (id)getAppListSuccess:(void (^)(id task,id data))success failure:(void (^)(id task,id data, NSError *error))failure;
 
+#pragma mark -- 获取关于
++ (id )getAppAboutCallback:(void(^)(id task,id response,NSError *error))callback;
++ (id )getAppAboutWithOutput:(NSString *)output callback:(void(^)(id task,id response,NSError *error))callback;
 
-//获取关于
-+ (BHttpRequestOperation *)getAppAboutCallback:(void(^)(BHttpRequestOperation *operation,id response,NSError *error))callback;
-
-+ (BHttpRequestOperation *)getAppAboutWithOutput:(NSString *)output callback:(void(^)(BHttpRequestOperation *operation,id response,NSError *error))callback;
-//意见反馈
-+ (BHttpRequestOperation *)feedback:(NSString *)content callback:(void (^)(id operation,id response, NSError *error))callback;
++ (id )feedback:(NSString *)content success:(void (^)(id task,id response))success failure:(void (^)(id task, NSError *error))failure ;
 @end
 
 @interface ApplicationVersion : NSObject
@@ -51,9 +49,9 @@ typedef NSInteger AppUpdateRole;
 - (id)initWithDictionary:(NSDictionary *)dict;
 
 //检测版本更新
-+ (BHttpRequestOperation *)getAppVersionCallback:(void(^)(BHttpRequestOperation *operation, ApplicationVersion *app, NSError *error))callback;
++ (id )getAppVersionSuccess:(void(^)(id task, ApplicationVersion* app))success failure:(void(^)(id task, ApplicationVersion* app,NSError *error))failure;
 
-+ (BHttpRequestOperation *)registerNotificationDeviceToken:(NSString *)token callback:(void(^)(BHttpRequestOperation *operation, NSDictionary *json, NSError *error))callback;
++ (id )registerNotificationDeviceToken:(NSString *)token success:(void(^)(id task, NSDictionary *json))success failure:(void(^)(id task, NSError *error))failure;
 
 
 @end

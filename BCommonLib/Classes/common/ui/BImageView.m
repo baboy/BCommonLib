@@ -10,6 +10,7 @@
 #import "BCommonLibContext.h"
 #import "BCommonLibCategories.h"
 #import "UIButton+x.h"
+#import "UIBUtton+AFNetworking.h"
 
 #define BImgViewTitleFont			[UIFont boldSystemFontOfSize:12]
 #define BImgViewTitleColor			[UIColor whiteColor]
@@ -87,10 +88,6 @@
 }
 - (void) setImageLocalPath:(NSString *)fp{
 	[self.button setImage:[UIImage imageWithContentsOfFile:fp] forState:UIControlStateNormal];
-}
-- (void) setImageURL:(NSString *)imgUrl{
-    [self.button setImageURLString:imgUrl forState:UIControlStateNormal];
-	
 }
 - (void) showProgress:(BOOL)showProgress{
     [_progressView setHidden:!showProgress];

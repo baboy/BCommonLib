@@ -14,22 +14,18 @@ typedef enum _BHttpRequestCachePolicy {
     
     // no cache
 	BHttpRequestCachePolicyNone = 0,
-    
-	// The the request not to write to the cache
-	BHttpRequestCachePolicySaveCache = 1,
-    
-	// If cached data exists, use it even if it is stale. This means requests will not talk to the server unless the resource they are requesting is not in the cache
-    BHttpRequestCachePolicyLoadIfNotCached = 1<<1,
-    
-	// If cached data exists, use it even if it is stale. If cached data does not exist, stop (will not set an error on the request)
-	BHttpRequestCachePolicyDontLoad = 1<<2,
-    BHttpRequestCachePolicyAlwaysLoad = 1<<3,
-	// Specifies that cached data may be used if the request fails. If cached data is used, the request will succeed without error. Usually used in combination with other options above.
-	BHttpRequestCachePolicyFallbackToCacheIfLoadFails = 1<<4,
-    BHttpRequestCachePolicyBothReadCacheAndLoad = BHttpRequestCachePolicyDontLoad | BHttpRequestCachePolicyAlwaysLoad
+	// The the request write to the cache
+	BHttpRequestCachePolicyCached = 1,
+    // load if not cached
+    BHttpRequestCachePolicyLoadIfNotCached = 1<<1 | BHttpRequestCachePolicyCached,
+    //read cache if load failed
+	BHttpRequestCachePolicyFallbackToCacheIfLoadFails = 1<<2 | BHttpRequestCachePolicyCached,
 }BHttpRequestCachePolicy;
 
 
+
+extern NSString * getCacheFilePath(NSURL *url) ;
+extern NSData * getCacheFileData(NSURL *url);
 
 @interface BHttpRequestCacheHandler : NSObject
 @property (nonatomic, assign) BHttpRequestCachePolicy cachePolicy;

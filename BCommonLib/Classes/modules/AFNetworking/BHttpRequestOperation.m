@@ -12,7 +12,7 @@
 
 
 typedef void (^AFURLConnectionOperationProgressBlock)(NSUInteger bytes, long long totalBytes, long long totalBytesExpected);
-
+/*
 @interface AFURLConnectionOperation(x)<NSURLConnectionDataDelegate>
 - (long long)totalBytesRead;
 - (void)setTotalBytesRead:(long long)t;
@@ -21,16 +21,19 @@ typedef void (^AFURLConnectionOperationProgressBlock)(NSUInteger bytes, long lon
 - (void)finish;
 - (void)operationDidStart;
 @end
-
+*/
 
 
 @interface BHttpRequestOperation()
+/*
 @property (readwrite, nonatomic, copy) void (^successCallbackBlock)(AFHTTPRequestOperation *operation, id responseObject);
 @property (nonatomic, retain) NSString *tmpFilePath;
 @property (nonatomic, assign) BOOL readFromCache;
+ */
 @end
 
 @implementation BHttpRequestOperation
+/*
 - (void)dealloc{
 }
 - (NSString *)responseString{
@@ -148,4 +151,5 @@ typedef void (^AFURLConnectionOperationProgressBlock)(NSUInteger bytes, long lon
     self.successCallbackBlock = success;
     [super setCompletionBlockWithSuccess:success failure:failure];
 }
+ */
 @end

@@ -11,10 +11,12 @@
 @interface UIButton(x)
 - (void)centerImageAndTitle:(float)space;
 - (void)centerImageAndTitle;
+/*
 - (void)setImageURLString:(NSString *)url forState:(UIControlState)state;
 - (void)setImageURLString:(NSString *)url placeholder:(UIImage*)placeholder forState:(UIControlState)state;
 - (void)setBackgroundImageURLString:(NSString *)url forState:(UIControlState)state;
 - (void)setBackgroundImageURLString:(NSString *)url
                   placeholder:(UIImage*)placeholder
                      forState:(UIControlState)state;
+ */
 @end

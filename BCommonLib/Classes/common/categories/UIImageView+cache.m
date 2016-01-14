@@ -62,6 +62,7 @@ static char UIImageViewCacheOperationObjectKey;
     }
     self.image = placeholderImage;
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
+    /*
     BHttpRequestOperation *operation = [[BHttpRequestOperation alloc] initWithRequest:request];
     [operation setCompletionBlockWithSuccess:^(id operation, id responseObject) {
         NSDictionary *userInfo = [operation userInfo];
@@ -88,6 +89,8 @@ static char UIImageViewCacheOperationObjectKey;
     self.requestOperation = operation;
     [[[self class] sharedImageRequestOperationQueue] addOperation:self.requestOperation];
     return operation;
+     */
+    return nil;
 }
 - (void)setImageURLString:(NSString *)url{
     [self setImageURLString:url placeholderImage:nil withImageLoadedCallback:nil];

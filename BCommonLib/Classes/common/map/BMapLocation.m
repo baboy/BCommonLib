@@ -90,55 +90,53 @@
 }
 + (BHttpRequestOperation *)getLocationByIpSuccess:(void (^)(BMapLocation *loc))success failure:(void (^)(NSError *error))failure{
     return [[BHttpRequestManager defaultManager]
-     jsonRequestOperationWithGetRequest:@"http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json"
-     parameters:nil
-     success:^(BHttpRequestOperation *operation, id json, bool isReadFromCache) {
-         BMapLocation *loc = nil;
-         if (json) {
-             loc = [[BMapLocation alloc] init];
-             loc.country = [json valueForKey:@"country"];
-             loc.province = [json valueForKey:@"province"];
-             loc.city = [json valueForKey:@"city"];
-             loc.district = [json valueForKey:@"district"];
-         }
-         success(loc);
-     }
-     failure:^(BHttpRequestOperation *operation, NSError *error) {
-         if (failure) {
-             failure(error);
-         }
-     }];
+            getJson:@"http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json"
+            parameters:nil
+            success:^(id  _Nonnull task, id  _Nullable json) {
+                BMapLocation *loc = nil;
+                if (json) {
+                    loc = [[BMapLocation alloc] init];
+                    loc.country = [json valueForKey:@"country"];
+                    loc.province = [json valueForKey:@"province"];
+                    loc.city = [json valueForKey:@"city"];
+                    loc.district = [json valueForKey:@"district"];
+                }
+            }
+            failure:^(id  _Nullable task, id  _Nullable json, NSError * _Nonnull error) {
+                if (failure) {
+                    failure(error);
+                }
+            }];
 }
-+ (BHttpRequestOperation *)search:(NSString *)location callback:(void (^)(BHttpRequestOperation *operation,NSArray *locs, NSError *error))callback{
++ (BHttpRequestOperation *)search:(NSString *)location success:(void (^)(id task,NSArray *locs, NSError *error))success failure:(void (^)(id task, NSError *error))failure{
     NSString *url = [ApiQueryLocation URLStringWithParam:@{@"q":location}];
     return [[BHttpRequestManager defaultManager]
-     jsonRequestOperationWithGetRequest:url
-     parameters:nil
-     success:^(BHttpRequestOperation *operation, id json, bool isReadFromCache) {
-         HttpResponse *response = [HttpResponse responseWithDictionary:json];
-         NSMutableArray *addrs = nil;
-         NSError *error = nil;
-         if (response.isSuccess) {
-             NSArray *list = response.data;
-             if ([list isKindOfClass:[NSArray class]]) {
-                 addrs = [NSMutableArray array];
-                 NSInteger n = [list count];
-                 for (int i=0; i<n; i++) {
-                     BMapLocation *loc = /*AUTORELEASE*/([[BMapLocation alloc] initWithGeoData:[list objectAtIndex:i]]);
-                     [addrs addObject:loc];
-                 }
-             }
-         }
-         if ( !addrs || [addrs count] ==0 ) {
-             NSDictionary *userInfo = @{NSLocalizedDescriptionKey:NSLocalizedString(@"未获取到地址信息", nil)};
-             error = [NSError errorWithDomain:HttpRequestDomain code:-1 userInfo:userInfo];
-         }
-         callback(operation, addrs, error);
-     }
-     failure:^(BHttpRequestOperation *operation, NSError *error) {
-         if (callback) {
-             callback(operation, nil, error);
-         }
-     }];
+     getJson:url
+            parameters:nil
+            success:^(id  _Nonnull task, id  _Nullable json) {
+                HttpResponse *response = [HttpResponse responseWithDictionary:json];
+                NSMutableArray *addrs = nil;
+                NSError *error = nil;
+                if (response.isSuccess) {
+                    NSArray *list = response.data;
+                    if ([list isKindOfClass:[NSArray class]]) {
+                        addrs = [NSMutableArray array];
+                        NSInteger n = [list count];
+                        for (int i=0; i<n; i++) {
+                            BMapLocation *loc = /*AUTORELEASE*/([[BMapLocation alloc] initWithGeoData:[list objectAtIndex:i]]);
+                            [addrs addObject:loc];
+                        }
+                    }
+                }
+                if ( !addrs || [addrs count] ==0 ) {
+                    NSDictionary *userInfo = @{NSLocalizedDescriptionKey:NSLocalizedString(@"未获取到地址信息", nil)};
+                    error = [NSError errorWithDomain:HttpRequestDomain code:-1 userInfo:userInfo];
+                }
+                success(task, addrs, error);
+
+            }
+            failure:^(id  _Nullable task, id  _Nullable json, NSError * _Nonnull error) {
+                failure(task, error);
+            }];
 }
 @end

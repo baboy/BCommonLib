@@ -53,52 +53,52 @@
 }
 
 #pragma mark -- 请求应用列表
-+ (BHttpRequestOperation *)getAppListCallback:(void(^)(BHttpRequestOperation *operation, NSArray *response, NSError *error))callback{
++ (id)getAppListSuccess:(void (^)(id task,id data))success failure:(void (^)(id task,id data, NSError *error))failure{
     
     id param = [[Device currentDevice] dict];
-    return [[BHttpRequestManager defaultManager]
-            jsonRequestOperationWithGetRequest:ApiQueryAppList
-            parameters:param
-            success:^(BHttpRequestOperation *operation, id json, bool isReadFromCache) {
-                DLOG(@"json = %@",json);
-                NSError *error = nil;
-                NSArray *groups = nil;
-                
-                HttpResponse *response = [HttpResponse responseWithDictionary:json];
-                if ([response isSuccess]) {
-                    groups = [Group groupsFromArray:[response data]];
-                    for (Group *group in groups) {
-                        group.data = [Application appsFromArray:group.data];
-                    }
-                }else{
-                    error = response.error;
-                }
-                if (callback) {
-                    callback(operation,groups,error);
-                }
-            }
-            failure:^(BHttpRequestOperation *operation, NSError *error) {
-                DLOG(@"fail:%@",error);
-                if (callback) {
-                    callback(operation, nil, error);
-                }
-            }];
+    return [[BHttpRequestManager defaultManager] getJson:ApiQueryAppList
+                                       parameters:param
+                                      cachePolicy:BHttpRequestCachePolicyFallbackToCacheIfLoadFails
+                                          success:^(id _Nonnull task, id _Nullable json) {
+                                              NSError *error = nil;
+                                              NSArray *groups = nil;
+                                              
+                                              HttpResponse *response = [HttpResponse responseWithDictionary:json];
+                                              if ([response isSuccess]) {
+                                                  groups = [Group groupsFromArray:[response data]];
+                                                  for (Group *group in groups) {
+                                                      group.data = [Application appsFromArray:group.data];
+                                                  }
+                                              }else{
+                                                  error = response.error;
+                                              }
+                                              if (success) {
+                                                  success(task,groups);
+                                              }
+                                          }
+                                          failure:^(id  _Nullable task, id  _Nullable json, NSError * _Nonnull error) {
+                                              if (failure) {
+                                                  failure(task, nil, error);
+                                              }
+                                          }];
 }
 
 
 #pragma mark -- 获取关于
-+ (BHttpRequestOperation *)getAppAboutCallback:(void(^)(BHttpRequestOperation *operation,id response,NSError *error))callback{
++ (id )getAppAboutCallback:(void(^)(id task,id response,NSError *error))callback{
     return [self getAppAboutWithOutput:@"json" callback:callback];
 }
 
-+ (BHttpRequestOperation *)getAppAboutWithOutput:(NSString *)output callback:(void(^)(BHttpRequestOperation *operation,id response,NSError *error))callback{
++ (id )getAppAboutWithOutput:(NSString *)output callback:(void(^)(id task,id response,NSError *error))callback{
     output = output ?:@"html";
     NSMutableDictionary *param = [NSMutableDictionary dictionaryWithDictionary:[[Device currentDevice] dict]];
     [param setValue:output forKey:@"output"];
+    return nil;
+    /*
     return [[BHttpRequestManager defaultManager]
             dataRequestWithURLRequest:ApiQueryAbout
             parameters:param
-            success:^(BHttpRequestOperation *operation, id data, bool isReadFromCache) {
+            success:^(id task, id data, bool isReadFromCache) {
                 id ret = nil;
                 id error = nil;
                 if ([output isEqualToString:@"json"]) {
@@ -115,42 +115,27 @@
                     ret = data;
                 }
                 if (callback) {
-                    callback(operation, ret, error);
+                    callback(task, ret, error);
                 }
             }
-            failure:^(BHttpRequestOperation *operation, NSError *error) {
+            failure:^(id task, NSError *error) {
                 DLOG(@"fail:%@",error);
                 if (callback) {
-                    callback(operation, nil, error);
+                    callback(task, nil, error);
                 }
             }];
+     */
 }
 
-+ (BHttpRequestOperation *)feedback:(NSString *)content callback:(void (^)(id operation,id response, NSError *error))callback {
++ (id )feedback:(NSString *)content success:(void (^)(id task,id response))success failure:(void (^)(id task, NSError *error))failure {
     NSMutableDictionary *param = [NSMutableDictionary dictionaryWithDictionary:[[Device currentDevice] dict]];
     [param setValue:content forKey:@"content"];
     [param setValue:APPID forKey:@"appid"];
-    return [[BHttpRequestManager defaultManager]
-            jsonRequestOperationWithPostRequest:ApiPostFeedback
-            parameters:param
-            success:^(BHttpRequestOperation *operation, id json, bool isReadFromCache) {
-                HttpResponse *response = [HttpResponse responseWithDictionary:json];
-                if ([response isSuccess]) {
-                    if (callback) {
-                        callback(operation, response, response.error);
-                    }
-                } else {
-                    if (callback) {
-                        callback(operation, nil, response.error);
-                    }
-                }
-            }
-            failure:^(BHttpRequestOperation *operation, NSError *error) {
-                DLOG(@"%@", error);
-                if (callback) {
-                    callback(operation, nil, error);
-                }
-            }];
+    return [[BHttpRequestManager defaultManager] POST:ApiPostFeedback
+                                    parameters:param
+                                      progress:nil
+                                       success:success
+                                       failure:failure];
 }
 @end
 
@@ -172,56 +157,51 @@
     return self;
 }
 #pragma mark -- 检测版本
-+ (BHttpRequestOperation *)getAppVersionCallback:(void(^)(BHttpRequestOperation *operation, ApplicationVersion* app,NSError *error))callback{
++ (id )getAppVersionSuccess:(void(^)(id task, ApplicationVersion* app))success failure:(void(^)(id task, ApplicationVersion* app,NSError *error))failure{
     
     
     id param = [[Device currentDevice] dict];
     return [[BHttpRequestManager defaultManager]
-            jsonRequestOperationWithGetRequest:ApiQueryAppVersion
-            parameters:param
-            success:^(BHttpRequestOperation *operation, id json, bool isReadFromCache) {
-                DLOG(@"json = %@",json);
-                NSError *error = nil;
-                ApplicationVersion *app = nil;
-                int role = 0;
-                HttpResponse *respone = [HttpResponse responseWithDictionary:json];
-                if ([respone isSuccess]) {
-                    app = [[ApplicationVersion alloc] initWithDictionary:respone.data];
-                }else {
-                    error = respone.error;
-                    role = [[respone.data valueForKey:@"role"] intValue];
-                }
-                
-                if (callback) {
-                    callback(operation,app,error);
-                }
-            }
-            failure:^(BHttpRequestOperation *operation, NSError *error) {
-                DLOG(@"fail = %@",error);
-                if (callback) {
-                    callback(operation,nil,error);
-                }
-            }];
+     getJson:ApiQueryAppVersion
+     parameters:param
+     success:^(id  _Nonnull task, id  _Nullable json) {
+         DLOG(@"json = %@",json);
+         NSError *error = nil;
+         ApplicationVersion *app = nil;
+         int role = 0;
+         HttpResponse *respone = [HttpResponse responseWithDictionary:json];
+         if ([respone isSuccess]) {
+             app = [[ApplicationVersion alloc] initWithDictionary:respone.data];
+         }else {
+             error = respone.error;
+             role = [[respone.data valueForKey:@"role"] intValue];
+         }
+         
+         if (success) {
+             success(task,app);
+         }
+     }
+     failure:^(id  _Nullable task, id  _Nullable json, NSError * _Nonnull error) {
+         failure(task,json,error);
+     }];
 }
 
-+ (BHttpRequestOperation *)registerNotificationDeviceToken:(NSString *)token callback:(void(^)(BHttpRequestOperation *operation, NSDictionary *json, NSError *error))callback{
++ (id )registerNotificationDeviceToken:(NSString *)token success:(void(^)(id task, NSDictionary *json))success failure:(void(^)(id task, NSError *error))failure{
     
     NSMutableDictionary *param = [NSMutableDictionary dictionaryWithDictionary:[[Device currentDevice] dict]];
     [param setValue:token forKey:@"token"];
     return [[BHttpRequestManager defaultManager]
-            jsonRequestOperationWithPostRequest:ApiRegisterDeviceToken
-            parameters:param
-            success:^(BHttpRequestOperation *operation, id json, bool isReadFromCache) {
-                HttpResponse *respone = [HttpResponse responseWithDictionary:json];
-                if (callback) {
-                    callback(operation, [respone data], [respone error]);
-                }
-            }
-            failure:^(BHttpRequestOperation *operation, NSError *error) {
-                DLOG(@"fail = %@",error);
-                if (callback) {
-                    callback(operation,nil,error);
-                }
-            }];
-}
+     POST:ApiRegisterDeviceToken
+     parameters:param
+     progress:nil
+     success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable json) {
+         HttpResponse *respone = [HttpResponse responseWithDictionary:json];
+         if (success) {
+             success(task, [respone data]);
+         }
+     }
+     failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+         failure(task, error);
+     }];
+    }
 @end

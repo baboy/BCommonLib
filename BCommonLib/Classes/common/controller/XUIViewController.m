@@ -290,10 +290,10 @@
 }
 
 - (void)setHttpRequest:(id)request forKey:(NSString *)key{
-    AFHTTPRequestOperation *req = [self.requestPool valueForKey:key];
-    if (req && ![req isCancelled]) {
-        [req cancel];
-    }
+    //AFHTTPRequestOperation *req = [self.requestPool valueForKey:key];
+    //if (req && ![req isCancelled]) {
+    //    [req cancel];
+    //}
     [self.requestPool setValue:request forKey:key];    
 }
 - (UIAlertView*)alert:(NSString *)msg button:(NSString *)buttonTitle,...{
@@ -368,8 +368,8 @@
 - (void)showDropMenu:(id)sender{}
 - (void)dealloc{
     for (NSString *key in [_requestPool allKeys]) {
-        AFHTTPRequestOperation *req = [self.requestPool valueForKey:key];
-        [req cancel];
+        //AFHTTPRequestOperation *req = [self.requestPool valueForKey:key];
+        //[req cancel];
     }
     ////
     ////

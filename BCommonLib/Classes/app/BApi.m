@@ -70,5 +70,5 @@
 @end
 
 NSString * getApi(NSString *key, NSDictionary *param){
-    return [BApi apiForKey:key withParam:param];
+    return [[BApi handler] apiForKey:key withParam:param];
 }

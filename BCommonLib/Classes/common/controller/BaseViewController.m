@@ -63,7 +63,7 @@
     return YES;
 }
 - (void)checkAppViersion{
-    [ApplicationVersion getAppVersionCallback:^(BHttpRequestOperation *operation,ApplicationVersion *app, NSError *error) {
+    [ApplicationVersion getAppVersionSuccess:^(id task, ApplicationVersion *app) {
         self.app = app;
         NSString *msg = app.msg;
         NSMutableArray *btnTitles = [NSMutableArray array];
@@ -100,7 +100,11 @@
             [alert show];
             
         }
-    }];
+
+    }
+                                     failure:^(id task, ApplicationVersion *app, NSError *error) {
+                                         
+                                     }];
 }
 
 + (void)showNetConnectMessage{

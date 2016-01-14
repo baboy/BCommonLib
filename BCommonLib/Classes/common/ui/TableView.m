@@ -104,21 +104,17 @@
 	}
     NSString *url = [imgURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     DLOG(@"loadImg:%@",url);
-    BHttpRequestManager * requestManager = [BHttpRequestManager defaultManager];
-    [requestManager cacheFileRequestWithURLRequest:url
-                                        parameters:nil
-                                           success:^(BHttpRequestOperation *operation, id data, bool isReadFromCache) {
-                                               if (self && [self isKindOfClass:[TableView class]]) {
-                                                   NSString *fp = operation.cacheFilePath;
-                                                   
-                                                   NSIndexPath *indexPath = [[operation userInfo] valueForKey:@"indexPath"];
-                                                   [self setImagePath:fp forURL:operation.request.URL forIndexPath:indexPath];
-                                               }
-                                           }
-                                           failure:^(BHttpRequestOperation *operation, NSError *error) {
-                                               DLOG(@"[TableView] loadImage fail:%@",error);
-                                               
-                                           } ];
+    BHttpRequestManager * manager = [BHttpRequestManager defaultManager];
+    [manager download:url
+             progress:nil
+    completionHandler:^(NSURLResponse * _Nullable response, NSURL * _Nullable filePath, NSError * _Nullable error) {
+        if (self && [self isKindOfClass:[TableView class]]) {
+            //NSString *fp = operation.cacheFilePath;
+            
+            //                                                   NSIndexPath *indexPath = [[operation userInfo] valueForKey:@"indexPath"];
+            //                                                   [self setImagePath:fp forURL:operation.request.URL forIndexPath:indexPath];
+        }
+    }];
     
 }
 - (void)setImagePath:(NSString *)fp forURL:(NSURL *)url forIndexPath:(NSIndexPath *)indexPath{

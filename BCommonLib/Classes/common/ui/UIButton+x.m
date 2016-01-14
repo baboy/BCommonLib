@@ -25,6 +25,7 @@
 - (void)centerImageAndTitle{
     [self centerImageAndTitle:3.0];
 }
+/*
 - (void)setImageURLString:(NSString *)url background:(BOOL)flag forState:(UIControlState)state{
     if (!url) {
         return;
@@ -47,10 +48,11 @@
         return;
     }
     [[BHttpRequestManager defaultManager]
-     cacheFileRequestWithURLRequest:url
-     parameters:nil
-     userInfo:@{@"object":self, @"state":[NSNumber numberWithInt:state]}
-     success:^(BHttpRequestOperation *operation, id data, bool isReadFromCache) {
+     download:url
+     progress:^(NSProgress * _Nullable downloadProgress) {
+         
+     }
+     completionHandler:^(NSURLResponse * _Nullable response, NSURL * _Nullable filePath, NSError * _Nullable error) {
          NSDictionary *userInfo = [operation userInfo];
          id object = userInfo?[userInfo valueForKey:@"object"]:nil;
          NSString *fp = [operation cacheFilePath];
@@ -65,6 +67,14 @@
                  }
              }
          }
+     }];
+    
+    [[BHttpRequestManager defaultManager]
+     cacheFileRequestWithURLRequest:url
+     parameters:nil
+     userInfo:@{@"object":self, @"state":[NSNumber numberWithInt:state]}
+     success:^(BHttpRequestOperation *operation, id data, bool isReadFromCache) {
+         
      }
      failure:^(BHttpRequestOperation *operation, NSError *error) {
          
@@ -95,4 +105,5 @@
     [self setImageURLString:url placeholder:nil background:YES forState:state];
     
 }
+ */
 @end

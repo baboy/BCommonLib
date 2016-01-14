@@ -88,31 +88,31 @@ static id _current_user = nil;
 }
 + (void)checkLoginWithCallback:(void (^)(BUser* user,NSError *error))callback{
 }
-+ (BHttpRequestOperation *)loginWithUserName:(NSString *)uname password:(NSString *)pwd success:(void (^)(BUser *, NSError *))success failure:(void (^)(NSError *))failure{
++ (id)loginWithUserName:(NSString *)uname password:(NSString *)pwd success:(void (^)(BUser *, NSError *))success failure:(void (^)(NSError *))failure{
     
     NSDictionary *params = @{@"username":uname,@"password":pwd};
-    
-    return [[BHttpRequestManager defaultManager]
-            jsonRequestOperationWithPostRequest:ApiLogin
-            parameters:params
-            success:^(BHttpRequestOperation *operation, id responseObject, bool isReadFromCache) {
-                
-            }
-            failure:^(BHttpRequestOperation *operation, NSError *error) {
-                DLOG(@"[BUser] loginWithUserName error:%@",error);
-            }];
+    [[BHttpRequestManager defaultManager]
+     getJson:ApiLogin
+     parameters:params
+     success:^(id  _Nonnull task, id  _Nullable json) {
+         
+     }
+     failure:^(id  _Nullable task, id  _Nullable json, NSError * _Nonnull error) {
+         
+     }];
 }
-+ (BHttpRequestOperation *)registerWithUserName:(NSString *)uname email:(NSString *)email password:(NSString *)pwd success:(void (^)(BUser *, NSError *))success failure:(void (^)(NSError *))failure{
++ (id)registerWithUserName:(NSString *)uname email:(NSString *)email password:(NSString *)pwd success:(void (^)(BUser *, NSError *))success failure:(void (^)(NSError *))failure{
     
     NSDictionary *params = @{@"username":uname,@"password":pwd,@"email":email};
     return [[BHttpRequestManager defaultManager]
-           jsonRequestOperationWithPostRequest:ApiRegister
-           parameters:params
-           success:^(BHttpRequestOperation *operation, id responseObject, bool isReadFromCache) {
-               
-           }
-           failure:^(BHttpRequestOperation *operation, NSError *error) {
-               DLOG(@"[BUser] registerWithUserName error:%@",error);
-           }];
+            POST:ApiRegister
+            parameters:params
+            progress:nil
+            success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+                
+            }
+            failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+                
+            }];
 }
 @end

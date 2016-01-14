@@ -10,9 +10,10 @@
 #import "Base64.h"
 #import "BCommonLibHttp.h"
 #import "Global.h"
+#import "NSString+x.h"
 
 @interface CacheURLProtocol()
-@property(nonatomic, retain) BHttpRequestOperation *cacheOperation;
+@property(nonatomic, retain) id task;
 @end
 
 @implementation CacheURLProtocol
@@ -42,35 +43,36 @@
         [self.client URLProtocolDidFinishLoading:self];
         return;
     }
-    BHttpRequestOperation *operation =
-    [[BHttpRequestManager defaultManager]
-     cacheFileRequestWithURLRequest:urlString
-     parameters:nil
-     success:^(BHttpRequestOperation *operation, id data, bool isReadFromCache) {
-         data = [operation responseData];
+    id task = [[BHttpRequestManager defaultManager]
+     download:urlString
+     progress:nil
+     completionHandler:^(NSURLResponse * _Nullable response, NSURL * _Nullable filePath, NSError * _Nullable error) {
+         if (error) {
+             [self.client URLProtocol:self didFailWithError:error];
+         }
+         NSData *data = nil;
+         if ([[filePath path] fileExists]) {
+             data = [NSData dataWithContentsOfFile:filePath];
+         }
          [self.client URLProtocol:self didLoadData:data];
          [self.client URLProtocolDidFinishLoading:self];
-     }
-     failure:^(BHttpRequestOperation *operation, NSError *error) {
-          [self.client URLProtocol:self didFailWithError:error];
      }];
-    self.cacheOperation = operation;
+    self.task = task;
 }
 
 // Called by URL loading system in response to normal finish, error or abort. Cleans up in each case.
 - (void)stopLoading{
     //DLOG(@"stopLoading...:%d",[[cacheRequest responseData] length]);
-    if (self.cacheOperation) {
-        [self.cacheOperation cancel];
+    if (self.task) {
+        [self.task cancel];
+        self.task = nil;
     }
-    self.cacheOperation = nil;
 }
 - (void)dealloc{  
-    if (self.cacheOperation) {
-        [self.cacheOperation cancel];
+    if (self.task) {
+        [self.task cancel];
+        self.task = nil;
     }
-    //_cacheOperation ;
-    //[super dealloc];
 }
 @end
 

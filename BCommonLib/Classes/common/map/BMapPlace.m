@@ -55,37 +55,34 @@
         [d setValue:self.vicinity forKey:@"vicinity"];
     return d;
 }
-+ (BHttpRequestOperation *)search:(NSString *)location callback:(void (^)(BHttpRequestOperation *operation,NSArray *locs, NSError *error))callback{
++ (BHttpRequestOperation *)search:(NSString *)location success:(void (^)(id task,NSArray *locs, NSError *error))success failure:(void (^)(id task, NSError *error))failure{
     NSString *url = [ApiQueryLocation URLStringWithParam:@{@"loc":location}];
     return [[BHttpRequestManager defaultManager]
-     jsonRequestOperationWithGetRequest:url
-     parameters:nil
-     success:^(BHttpRequestOperation *operation, id json, bool isReadFromCache) {
-         HttpResponse *response = [HttpResponse responseWithDictionary:json];
-         NSMutableArray *addrs = nil;
-         NSError *error = response.error;
-         if (response.isSuccess) {
-             NSDictionary *data = response.data;
-             NSArray *list = [data valueForKey:@"list"];
-             if ([list isKindOfClass:[NSArray class]]) {
-                 addrs = [NSMutableArray array];
-                 NSInteger n = [list count];
-                 for (int i=0; i<n; i++) {
-                     BMapPlace *loc = /*AUTORELEASE*/([[BMapPlace alloc] initWithDictionary:[list objectAtIndex:i]]);
-                     [addrs addObject:loc];
-                 }
-             }
-         }
-         if ( !addrs || [addrs count] ==0 ) {
-             NSDictionary *userInfo = @{NSLocalizedDescriptionKey:NSLocalizedString(@"未获取到地址信息", nil)};
-             error = [NSError errorWithDomain:HttpRequestDomain code:-1 userInfo:userInfo];
-         }
-         callback(operation, addrs, error);
-     }
-     failure:^(BHttpRequestOperation *operation, NSError *error) {
-         if (callback) {
-             callback(operation, nil, error);
-         }
-     }];
+            getJson:url
+            parameters:nil
+            success:^(id  _Nonnull task, id  _Nullable json) {
+                HttpResponse *response = [HttpResponse responseWithDictionary:json];
+                NSMutableArray *addrs = nil;
+                NSError *error = response.error;
+                if (response.isSuccess) {
+                    NSDictionary *data = response.data;
+                    NSArray *list = [data valueForKey:@"list"];
+                    if ([list isKindOfClass:[NSArray class]]) {
+                        addrs = [NSMutableArray array];
+                        NSInteger n = [list count];
+                        for (int i=0; i<n; i++) {
+                            BMapPlace *loc = /*AUTORELEASE*/([[BMapPlace alloc] initWithDictionary:[list objectAtIndex:i]]);
+                            [addrs addObject:loc];
+                        }
+                    }
+                }
+                if ( !addrs || [addrs count] ==0 ) {
+                    NSDictionary *userInfo = @{NSLocalizedDescriptionKey:NSLocalizedString(@"未获取到地址信息", nil)};
+                    error = [NSError errorWithDomain:HttpRequestDomain code:-1 userInfo:userInfo];
+                }
+                success(task, addrs, error);
+            } failure:^(id  _Nullable task, id  _Nullable json, NSError * _Nonnull error) {
+                failure(task, error);
+            }];
 }
 @end

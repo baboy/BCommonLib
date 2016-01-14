@@ -12,6 +12,22 @@
 #import "BCommonLibCategories.h"
 #import "AppContext.h"
 
+NSString * getCacheFilePath(NSURL *url) {
+    NSString *fn = [[url absoluteString] md5];
+    NSString *ext = [url pathExtension];
+    if ([ext length]==0) {
+        ext = @"tmp";
+    }
+    return [AppCache cachePath:[NSString stringWithFormat:@"%@.%@",fn,ext]];
+}
+NSData * getCacheFileData(NSURL *url){
+    NSString *fp = getCacheFilePath(url);
+    if (fp && [[NSFileManager defaultManager] fileExistsAtPath:fp]) {
+        return [NSData dataWithContentsOfFile:fp];
+    }
+    return nil;
+}
+
 @implementation BHttpRequestCacheHandler
 + (id)defaultCacheHandler{
     static id _defaultHttpRequestCache = nil;
@@ -56,3 +72,4 @@
     return nil;
 }
 @end
+ 

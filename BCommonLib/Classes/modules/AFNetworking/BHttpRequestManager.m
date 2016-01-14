@@ -8,6 +8,8 @@
 
 #import "BHttpRequestManager.h"
 #import "BCommonLibCategories.h"
+#import "Utils.h"
+#import "Global.h"
 
 @implementation BHttpRequestManager
 + (id)defaultManager {
@@ -19,7 +21,134 @@
     
     return _defaultHttpRequestManager;
 }
+- (id)init{
+    if (self = [super init]) {
+        self.responseSerializer.acceptableContentTypes = nil;
+    }
+    return self;
+}
 
+- (nullable id )getData:(nullable NSString *)URLString
+             parameters:(nullable id)parameters
+            cachePolicy:(BHttpRequestCachePolicy)cachePolicy
+                success:(nullable void (^)(id _Nonnull task, id _Nullable json))success
+                failure:(nullable void (^)(id _Nullable task,id _Nullable json, NSError * _Nonnull error))failure;{
+    return [super GET:URLString
+           parameters:parameters
+             progress:nil
+              success:^(NSURLSessionDataTask * _Nullable dataTask, id _Nonnull json){
+                  success(dataTask,json);
+                  if (cachePolicy & BHttpRequestCachePolicyCached) {
+                      if (json) {
+                          
+                          NSString *fp = getCacheFilePath([NSURL URLWithString:[URLString URLStringWithParam:parameters]]);
+                          [[json jsonData] writeToFile:fp atomically:YES];
+                          DLOG(@"%@%lld",fp,[fp sizeOfFile]);
+                      }
+                  }
+              }
+              failure:^(NSURLSessionDataTask * _Nullable dataTask, NSError * _Nonnull error){
+                  id json = nil;
+                  if (cachePolicy & BHttpRequestCachePolicyFallbackToCacheIfLoadFails) {
+                      NSData *data = getCacheFileData([NSURL URLWithString:[URLString URLStringWithParam:parameters]]);
+                      if (data) {
+                          DLOG(@"read cache:%@",getCacheFilePath([NSURL URLWithString:[URLString URLStringWithParam:parameters]]));
+                          json = [data json];
+                      }
+                  }
+                  failure(dataTask,json,error);
+              }];
+
+}
+- (id)getJson:(NSString *)URLString
+                   parameters:(id)parameters
+                   cachePolicy:(BHttpRequestCachePolicy)cachePolicy
+                      success:(void (^)(id _Nonnull, id _Nullable))success
+                      failure:(void (^)(id _Nullable,id _Nullable, NSError * _Nonnull))failure
+{
+    return [super GET:URLString
+           parameters:parameters
+             progress:nil
+              success:^(NSURLSessionDataTask * _Nullable dataTask, id _Nonnull json){
+                  success(dataTask,json);
+                  if (cachePolicy & BHttpRequestCachePolicyCached) {
+                      if (json) {
+                          
+                          NSString *fp = getCacheFilePath([NSURL URLWithString:[URLString URLStringWithParam:parameters]]);
+                          [[json jsonData] writeToFile:fp atomically:YES];
+                          DLOG(@"%@%lld",fp,[fp sizeOfFile]);
+                      }
+                  }
+              }
+              failure:^(NSURLSessionDataTask * _Nullable dataTask, NSError * _Nonnull error){
+                  id json = nil;
+                  if (cachePolicy & BHttpRequestCachePolicyFallbackToCacheIfLoadFails) {
+                      NSData *data = getCacheFileData([NSURL URLWithString:[URLString URLStringWithParam:parameters]]);
+                      if (data) {
+                          DLOG(@"read cache:%@",getCacheFilePath([NSURL URLWithString:[URLString URLStringWithParam:parameters]]));
+                          json = [data json];
+                      }
+                  }
+                  failure(dataTask,json,error);
+              }];
+}
+- (id)getJson:(NSString *)URLString
+                       parameters:(id)parameters
+                          success:(void (^)(id _Nonnull, id _Nullable))success
+                          failure:(void (^)(id _Nullable,id _Nullable, NSError * _Nonnull))failure
+{
+    return [self getJson:URLString
+              parameters:parameters
+            cachePolicy:BHttpRequestCachePolicyNone
+                 success:success
+                 failure:failure];
+}
+
+- (nullable NSURLSessionDataTask *)POST:(NSString *)URLString
+                             parameters:(nullable id)parameters
+                                success:(nullable void (^)(NSURLSessionDataTask *task, id _Nullable responseObject))success
+                                failure:(nullable void (^)(NSURLSessionDataTask * _Nullable task, NSError *error))failure{
+    return [super POST:URLString
+            parameters:parameters
+              progress:nil
+               success:success
+               failure:failure];
+}
+- (nullable id)download:(NSString *_Nullable)URLString
+            cachePolicy:(BHttpRequestCachePolicy)cachePolicy
+               progress:(nullable void (^)(NSProgress * _Nullable downloadProgress)) downloadProgressBlock
+      completionHandler:(nullable void (^)(NSURLResponse * _Nullable response, NSURL * _Nullable filePath, NSError * _Nullable error))completionHandler{
+    if (cachePolicy & BHttpRequestCachePolicyLoadIfNotCached) {
+        NSString *fp = getCacheFilePath([NSURL URLWithString:URLString]);
+        if ([fp sizeOfFile]>0) {
+            completionHandler(nil,[NSURL fileURLWithPath:fp],nil);
+        }
+    }
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:URLString]];
+    NSURLSessionDownloadTask *downloadTask = [super downloadTaskWithRequest:request
+                                 progress:downloadProgressBlock
+                              destination:^NSURL *(NSURL *targetPath, NSURLResponse *response) {
+                                  return [NSURL fileURLWithPath:getCacheFilePath([NSURL URLWithString:URLString])];
+                              }
+                        completionHandler:completionHandler];
+    [downloadTask resume];
+    return downloadTask;
+}
+
+- (nullable id)download:(NSString *_Nullable)URLString
+               progress:(nullable void (^)(NSProgress * _Nullable downloadProgress)) downloadProgressBlock
+      completionHandler:(nullable void (^)(NSURLResponse * _Nullable response, NSURL * _Nullable filePath, NSError * _Nullable error))completionHandler{
+    return [self download:URLString
+              cachePolicy:BHttpRequestCachePolicyLoadIfNotCached
+                 progress:downloadProgressBlock
+        completionHandler:completionHandler];
+}
+@end
+@interface BHttpRequestManager (x)
+
+@end
+@implementation BHttpRequestManager(x)
+/*
 - (BHttpRequestOperation *)createHttpRequestOperationWithRequest:(NSURLRequest *)request
                                               responseSerializer:(AFHTTPResponseSerializer *)responseSerializer
                                                         success:(void (^)(BHttpRequestOperation *operation, id data,bool isReadFromCache)) success
@@ -236,5 +365,5 @@
     return operation;
     
 }
-
+*/
 @end

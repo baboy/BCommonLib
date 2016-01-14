@@ -49,8 +49,8 @@
 + (void)checkLoginWithCallback:(void (^)(BUser* user,NSError *error))callback;
 
 //登录调用
-+ (BHttpRequestOperation *)loginWithUserName:(NSString *)uname password:(NSString *)pwd success:(void (^)(BUser* user, NSError *error))success failure:(void (^)(NSError *error))failure;
++ (id)loginWithUserName:(NSString *)uname password:(NSString *)pwd success:(void (^)(BUser* user, NSError *error))success failure:(void (^)(NSError *error))failure;
 //注册
-+ (BHttpRequestOperation *)registerWithUserName:(NSString *)uname email:(NSString *)email password:(NSString *)pwd success:(void (^)(BUser* user,NSError *error))success failure:(void (^)(NSError *error))failure;
++ (id)registerWithUserName:(NSString *)uname email:(NSString *)email password:(NSString *)pwd success:(void (^)(BUser* user,NSError *error))success failure:(void (^)(NSError *error))failure;
 
 @end

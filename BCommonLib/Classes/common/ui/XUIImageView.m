@@ -53,10 +53,10 @@
     [self addGestureRecognizer:tap];
 }
 - (id)setImageURLString:(NSString *)url placeholderImage:(UIImage *)placeholderImage withImageLoadedCallback:(void (^)(NSString *url, NSString *filePath, NSError *error))callback{
-    if (self.operation && ![self.operation isCancelled]) {
-        self.operation.completionBlock = nil;
-        [self.operation cancel];
-    }
+//    if (self.operation && ![self.operation isCancelled]) {
+//        self.operation.completionBlock = nil;
+//        [self.operation cancel];
+//    }
     self.operation = [super setImageURLString:url placeholderImage:placeholderImage withImageLoadedCallback:callback];
     return self.operation;
 }

@@ -35,21 +35,14 @@ static NSString *LogSessionID = nil;
 +(NSString *)appKey{
     return LogAppKey;
 }
-+ (BHttpRequestOperation *)postWithUrl:(NSString *)url params:(NSDictionary *)params callback:(void(^)(BHttpRequestOperation *operation, id response, NSError *error))callback{
++ (id)post:(NSString *)url params:(NSDictionary *)params success:(void(^)(id task, id response))success failure:(void(^)(id task, NSError *error))failure{
     
     return [[BHttpRequestManager defaultManager]
-            jsonRequestOperationWithPostRequest:url
+            POST:url
             parameters:params
-            success:^(BHttpRequestOperation *operation, id json, bool isReadFromCache) {
-                if (callback) {
-                    callback(operation, json,nil);
-                }
-            }
-            failure:^(BHttpRequestOperation *operation, NSError *error) {
-                if (callback) {
-                    callback(operation, nil,error);
-                }
-            }];
+            progress:nil
+            success:success
+            failure:failure];
 }
 + (NSMutableDictionary *)deviceParam{
     NSMutableDictionary *param = [NSMutableDictionary dictionaryWithDictionary:[[Device currentDevice] dict]];
@@ -64,20 +57,25 @@ static NSString *LogSessionID = nil;
     
 }
 + (void)startSession{
-    [self postWithUrl:LogApiRegisterDevice
+    [self post:LogApiRegisterDevice
                params:@{@"action":@"start",@"data":[@{@"device":[self deviceParam]} jsonString]}
-             callback:^(BHttpRequestOperation *operation, id json, NSError *error) {
-                 HttpResponse *response = [HttpResponse responseWithDictionary:json];
-                 if ([response isSuccess]) {
-                     DLOG(@"json:%@", json);
-                     DeviceSNO = /*RETAIN*/([[response data] valueForKey:@"sno"]);
-                 }else{
-                     DLOG(@"error:%@", error);
-                     AsyncCall(^{
-                         [BehaviorTracker startSession];
-                     }, 3, YES);
-                 }
-             }];
+     success:^(id task, id json) {
+         HttpResponse *response = [HttpResponse responseWithDictionary:json];
+         if ([response isSuccess]) {
+             DLOG(@"json:%@", json);
+             DeviceSNO = /*RETAIN*/([[response data] valueForKey:@"sno"]);
+         }else{
+             AsyncCall(^{
+                 [BehaviorTracker startSession];
+             }, 3, YES);
+         }
+     }
+       failure:^(id task, NSError *error) {
+           AsyncCall(^{
+               [BehaviorTracker startSession];
+           }, 3, YES);
+           
+       }];
 }
 + (void)trackEvent:(NSString *)event group:(NSString *)group element:(NSString *)ele duration:(int)dur{
     NSMutableDictionary *evtParam = [NSMutableDictionary dictionaryWithDictionary:DeviceParam];
@@ -89,11 +87,10 @@ static NSString *LogSessionID = nil;
     [evtParam setValue:[NSNumber numberWithInt:dur] forKeyPath:@"duration"];
     [evtParam setValue:LogSessionID forKeyPath:@"session_id"];
     id param = @{@"device":[self deviceParam], @"events":@[evtParam]};
-    [self postWithUrl:LogApiPostEvent
+    [self post:LogApiPostEvent
                params:@{@"data":[param jsonString]}
-             callback:^(BHttpRequestOperation *operation, id json, NSError *error) {
-                 DLOG(@"%@",json);
-             }];
+     success:nil
+       failure:nil];
     
 }
 + (void)trackEvent:(NSString *)event group:(NSString *)group element:(NSString *)ele{
