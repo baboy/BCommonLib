@@ -36,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
             userInfo:(id)userInfo
                progress:(nullable void (^)(NSProgress * _Nullable downloadProgress)) downloadProgressBlock
       completionHandler:(nullable void (^)(NSURLResponse * _Nullable response, NSURL * _Nullable filePath, NSError * _Nullable error))completionHandler;
+
 - (nullable id)download:(NSString *_Nullable)URLString
             cachePolicy:(BHttpRequestCachePolicy)cachePolicy
                progress:(nullable void (^)(NSProgress * _Nullable downloadProgress)) downloadProgressBlock
