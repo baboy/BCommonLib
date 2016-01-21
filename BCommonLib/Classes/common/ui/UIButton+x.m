@@ -7,13 +7,35 @@
 //
 
 #import "UIButton+x.h"
+#import <objc/runtime.h>
 #import "BCommonLibContext.h"
 #import "BCommonLibHttp.h"
 #import "NSString+x.h"
 #import "UIImageView+cache.h"
 
 
+
 @implementation UIButton (x)
+
++ (id)imageDownloadManager {
+    static id _imageDownloadManager = nil;
+    static dispatch_once_t initOnceImageDownloadManager;
+    dispatch_once(&initOnceImageDownloadManager, ^{
+        _imageDownloadManager = [[BHttpRequestManager alloc] init];
+    });
+    return _imageDownloadManager;
+}
+- (void)setDownloadTask:(id)task forState:(UIControlState)state isBackgroundImage:(BOOL)isBackground{
+    NSString *field = [NSString stringWithFormat:@"task_%d_%lu",isBackground,(unsigned long)state];
+    const char *key = [field UTF8String];
+    objc_setAssociatedObject(self, key, task, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+- (id)taskForState:(UIControlState)state isBackgroundImage:(BOOL)isBackground{
+    NSString *field = [NSString stringWithFormat:@"task_%d_%lu",isBackground,(unsigned long)state];
+    const char *key = [field UTF8String];
+    return (id)objc_getAssociatedObject(self, key);
+
+}
 - (void)centerImageAndTitle:(float)spacing{
     CGSize imageSize = self.imageView.frame.size;
     CGSize titleSize = [self.titleLabel.text sizeWithFont:self.titleLabel.font];
@@ -25,7 +47,6 @@
 - (void)centerImageAndTitle{
     [self centerImageAndTitle:3.0];
 }
-/*
 - (void)setImageURLString:(NSString *)url background:(BOOL)flag forState:(UIControlState)state{
     if (!url) {
         return;
@@ -47,39 +68,30 @@
         }
         return;
     }
-    [[BHttpRequestManager defaultManager]
-     download:url
-     progress:^(NSProgress * _Nullable downloadProgress) {
-         
-     }
-     completionHandler:^(NSURLResponse * _Nullable response, NSURL * _Nullable filePath, NSError * _Nullable error) {
-         NSDictionary *userInfo = [operation userInfo];
-         id object = userInfo?[userInfo valueForKey:@"object"]:nil;
-         NSString *fp = [operation cacheFilePath];
-         if (self == object) {
-             UIControlState state = [[userInfo valueForKey:@"state"] intValue];
-             UIImage *image = [UIImage imageWithContentsOfFile:fp];
-             if (image){
-                 if (flag) {
-                     [self setBackgroundImage:image forState:state];
-                 }else{
-                     [self setImage:image forState:state];
-                 }
-             }
-         }
-     }];
-    
-    [[BHttpRequestManager defaultManager]
-     cacheFileRequestWithURLRequest:url
-     parameters:nil
-     userInfo:@{@"object":self, @"state":[NSNumber numberWithInt:state]}
-     success:^(BHttpRequestOperation *operation, id data, bool isReadFromCache) {
-         
-     }
-     failure:^(BHttpRequestOperation *operation, NSError *error) {
-         
-         DLOG(@"[UIButton] setImageURL error:%@", error);
-     }];
+    @synchronized(self) {
+        id task = [self taskForState:state isBackgroundImage:flag];
+        if (task) {
+            [task cancel];
+            [self setDownloadTask:nil forState:state isBackgroundImage:flag];
+        }
+        task = [[UIButton imageDownloadManager]
+                download:url
+                progress:nil
+                success:^(id  _Nonnull task, NSURL *_Nullable fp) {
+                    UIImage *image = [UIImage imageWithContentsOfFile:[fp path]];
+                    if (image){
+                        if (flag) {
+                            [self setBackgroundImage:image forState:state];
+                        }else{
+                            [self setImage:image forState:state];
+                        }
+                    }
+                }
+                failure:^(id  _Nullable task, id  _Nullable fp, NSError * _Nonnull error) {
+                    
+                }];
+        [self setDownloadTask:task forState:state isBackgroundImage:flag];
+    }
 }
 - (void)setImageURLString:(NSString *)url placeholder:(UIImage*)placeholder background:(BOOL)flag forState:(UIControlState)state{
     if (placeholder) {
@@ -105,5 +117,4 @@
     [self setImageURLString:url placeholder:nil background:YES forState:state];
     
 }
- */
 @end

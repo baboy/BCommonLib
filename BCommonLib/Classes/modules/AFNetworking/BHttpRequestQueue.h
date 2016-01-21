@@ -7,10 +7,13 @@
 //
 
 
-
-@interface BHttpRequestTask:NSObject
+@interface BHttpRequestTask: NSObject
+@property (nonatomic, weak)  id _Nullable delegate;
 @property (nonatomic, strong) NSURLSessionTask *_Nullable task;
-@property (nonatomic, strong) NSUUID *_Nonnull leuuid;
+@property (nonatomic, strong) NSUUID *_Nullable uuid;
+@property (nonatomic, strong) NSString *_Nullable identifier;
+- (id _Nonnull)initWithTask:(NSURLSessionTask *_Nullable)task UUID:(NSUUID *_Nullable)uuid identifier:(NSString *_Nullable)identifier;
+- (void)cancel;
 @end
 
 @interface BHttpResponseHandler : NSObject
@@ -32,8 +35,13 @@
 
 
 @interface BHttpRequestQueue : NSObject
-@property (nonatomic, strong) NSMutableArray *tasks;
+@property (nonatomic, strong) NSMutableArray *_Nonnull queue;
+@property (nonatomic, strong) NSMutableDictionary *_Nonnull tasks;
 @property (nonatomic, assign) int maxConcurrentTaskCount;
-- (void)enqueue:(BHttpRequestTask *)task;
-- (BOOL)cancelTask:(BHttpRequestTask *)task;
+- (BOOL)cancelTask:(BHttpRequestTask *_Nullable)task;
+
+- (BHttpRequestRelativeTask *_Nullable)taskForIdentifier:(NSString *_Nonnull)identifier;
+- (void)addHandler:(BHttpResponseHandler *_Nullable)handler identifier:(NSString *_Nonnull)identifier;
+- (void)addTask:(BHttpRequestRelativeTask *_Nullable)task;
+- (void)removeTask:(BHttpRequestRelativeTask *_Nullable)task;
 @end

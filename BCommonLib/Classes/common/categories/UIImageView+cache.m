@@ -12,37 +12,33 @@
 #import "BCommonLibHttp.h"
 #import "BCommonLibCategories.h"
 
-static char UIImageViewCacheOperationObjectKey;
+static char UIImageViewCacheRequestTaskObjectKey;
 
-@interface UIImageView()
-@property (readwrite, nonatomic, strong) NSOperation *requestOperation;
-@end
 @implementation UIImageView(cache)
-- (NSOperation *)requestOperation {
-    return (NSOperation *)objc_getAssociatedObject(self, &UIImageViewCacheOperationObjectKey);
+- (void)dealloc{
+    [self cancelRequest];
 }
-
-- (void)setRequestOperation:(NSOperation *)requestOperation{
-    objc_setAssociatedObject(self, &UIImageViewCacheOperationObjectKey, requestOperation, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-+ (NSOperationQueue *)sharedImageRequestOperationQueue {
-    static NSOperationQueue *_imageRequestOperationQueue = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        _imageRequestOperationQueue = [[NSOperationQueue alloc] init];
-        [_imageRequestOperationQueue setMaxConcurrentOperationCount:NSOperationQueueDefaultMaxConcurrentOperationCount];
++ (id)imageDownloadManager {
+    static id _imageDownloadManager = nil;
+    static dispatch_once_t initOnceImageDownloadManager;
+    dispatch_once(&initOnceImageDownloadManager, ^{
+        _imageDownloadManager = [[BHttpRequestManager alloc] init];
     });
-    
-    return _imageRequestOperationQueue;
+    return _imageDownloadManager;
+}
+- (id)requestTask {
+    return objc_getAssociatedObject(self, &UIImageViewCacheRequestTaskObjectKey);
 }
 
-- (void)cancelImageRequestOperation {
-    [self.requestOperation cancel];
-    self.requestOperation = nil;
+- (void)setRequestTask:(id)requestTask{
+    objc_setAssociatedObject(self, &UIImageViewCacheRequestTaskObjectKey, requestTask, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+- (void)cancelRequest {
+    [[self requestTask] cancel];
+    [self setRequestTask:nil];
 }
 - (id)setImageURLString:(NSString *)url placeholderImage:(UIImage *)placeholderImage withImageLoadedCallback:(void (^)(NSString *url, NSString *filePath, NSError *error))callback{
-    [self cancelImageRequestOperation];
+    [self cancelRequest];
     
     NSString *fp = nil;
     if ([url isURL]) {
@@ -61,35 +57,27 @@ static char UIImageViewCacheOperationObjectKey;
         }
     }
     self.image = placeholderImage;
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
-    /*
-    BHttpRequestOperation *operation = [[BHttpRequestOperation alloc] initWithRequest:request];
-    [operation setCompletionBlockWithSuccess:^(id operation, id responseObject) {
-        NSDictionary *userInfo = [operation userInfo];
-        id object = userInfo?[userInfo valueForKey:@"object"]:nil;
-        NSString *fp = [operation cacheFilePath];
-        if (self == object ) {
-            if ([fp fileExists]) {
-                [self setImage:[UIImage imageWithContentsOfFile:fp]];
-            }
-            if (callback) {
-                callback(url, fp, nil);
-            }
-        }
-        
-    }
-                                     failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-                                         if (callback) {
-                                             callback(url, nil, error);
-                                         }
-                                         
-                                     }];
-    [operation setUserInfo:[NSDictionary dictionaryWithObject:self forKey:@"object"]];
-    [operation setCacheHandler:[BHttpRequestCacheHandler fileCacheHandler]];
-    self.requestOperation = operation;
-    [[[self class] sharedImageRequestOperationQueue] addOperation:self.requestOperation];
-    return operation;
-     */
+    id requestTask = [[UIImageView imageDownloadManager]
+     download:url
+     progress:nil
+     success:^(id  _Nonnull task, NSURL *_Nullable fp) {
+         if ( fp && [[fp path] fileExists]) {
+             [self setImage:[UIImage imageWithContentsOfFile:[fp path]]];
+         }
+         if (callback) {
+             callback(url, [fp path], nil);
+         }
+     }
+     failure:^(id  _Nullable task, NSURL *_Nullable fp, NSError * _Nonnull error) {
+         if ( fp && [[fp path] fileExists]) {
+             [self setImage:[UIImage imageWithContentsOfFile:[fp path]]];
+         }
+         if (callback) {
+             callback(url, [fp path], error);
+         }
+         
+     }];
+    [self setRequestTask:requestTask];
     return nil;
 }
 - (void)setImageURLString:(NSString *)url{

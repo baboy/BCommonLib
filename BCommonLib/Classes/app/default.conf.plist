@@ -3,12 +3,12 @@
 <plist version="1.0">
 <dict>
 	<key>appid</key>
-	<string>lava</string>
+	<string></string>
 	<key>app_link</key>
-	<string>http://www.tvie.com.cn</string>
+	<string></string>
 	<key>build</key>
 	<string>0</string>
 	<key>channel</key>
-	<string>lava</string>
+	<string></string>
 </dict>
 </plist>

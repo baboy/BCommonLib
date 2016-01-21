@@ -33,18 +33,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable id)download:(NSString *_Nullable)URLString
             cachePolicy:(BHttpRequestCachePolicy)cachePolicy
-            userInfo:(id)userInfo
+            userInfo:(id _Nullable)userInfo
                progress:(nullable void (^)(NSProgress * _Nullable downloadProgress)) downloadProgressBlock
-      completionHandler:(nullable void (^)(NSURLResponse * _Nullable response, NSURL * _Nullable filePath, NSError * _Nullable error))completionHandler;
+                success:(nullable void (^)(id _Nonnull task, id _Nullable fp))success
+                failure:(nullable void (^)(id _Nullable task,id _Nullable fp, NSError * _Nonnull error))failure;
 
 - (nullable id)download:(NSString *_Nullable)URLString
             cachePolicy:(BHttpRequestCachePolicy)cachePolicy
                progress:(nullable void (^)(NSProgress * _Nullable downloadProgress)) downloadProgressBlock
-      completionHandler:(nullable void (^)(NSURLResponse * _Nullable response, NSURL * _Nullable filePath, NSError * _Nullable error))completionHandler;
+                success:(nullable void (^)(id _Nonnull task, id _Nullable fp))success
+                failure:(nullable void (^)(id _Nullable task,id _Nullable fp, NSError * _Nonnull error))failure;
 
 - (nullable id)download:(NSString *_Nullable)URLString
                progress:(nullable void (^)(NSProgress * _Nullable downloadProgress)) downloadProgressBlock
-      completionHandler:(nullable void (^)(NSURLResponse * _Nullable response, NSURL * _Nullable filePath, NSError * _Nullable error))completionHandler;
+                success:(nullable void (^)(id _Nonnull task, id _Nullable fp))success
+                failure:(nullable void (^)(id _Nullable task,id _Nullable fp, NSError * _Nonnull error))failure;
 
 /*
 - (NSMutableURLRequest *)requestWithPOSTURL:(NSString *)url parameters:(NSDictionary *)parameters;

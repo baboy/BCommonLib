@@ -12,4 +12,7 @@
 
 - (id)userInfo ;
 - (void)setUserInfo:(id)userInfo;
+
+- (NSUUID *)uuid ;
+- (void)setUUID:(NSUUID *)uuid;
 @end

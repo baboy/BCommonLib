@@ -46,17 +46,27 @@
     id task = [[BHttpRequestManager defaultManager]
      download:urlString
      progress:nil
-     completionHandler:^(NSURLResponse * _Nullable response, NSURL * _Nullable filePath, NSError * _Nullable error) {
-         if (error) {
-             [self.client URLProtocol:self didFailWithError:error];
-         }
-         NSData *data = nil;
-         if ([[filePath path] fileExists]) {
-             data = [NSData dataWithContentsOfFile:filePath];
-         }
-         [self.client URLProtocol:self didLoadData:data];
-         [self.client URLProtocolDidFinishLoading:self];
-     }];
+    success:^(id  _Nonnull task, NSURL *_Nullable fp) {
+        NSData *data = nil;
+        if ([[fp path] fileExists]) {
+            data = [NSData dataWithContentsOfFile:fp];
+        }
+        [self.client URLProtocol:self didLoadData:data];
+        [self.client URLProtocolDidFinishLoading:self];
+    }
+               failure:^(id  _Nullable task, NSURL *_Nullable fp, NSError * _Nonnull error) {
+                   if (fp) {
+                       
+                       NSData *data = nil;
+                       if ([[fp path] fileExists]) {
+                           data = [NSData dataWithContentsOfFile:fp];
+                       }
+                       [self.client URLProtocol:self didLoadData:data];
+                       [self.client URLProtocolDidFinishLoading:self];
+                   }else{
+                       [self.client URLProtocol:self didFailWithError:error];
+                   }
+               }];
     self.task = task;
 }
 
