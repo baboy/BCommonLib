@@ -18,9 +18,7 @@
         BOOL enable = [[item objectForKey:@"enable"] boolValue];
         if(!enable)
             continue;
-        NSString *name = NSLocalizedString([item valueForKey:@"name"], nil);
         NSString *title = [item valueForKey:@"title"];
-        title = title? NSLocalizedString(title, nil) : name;
         
         NSString *icon = [item valueForKey:@"icon"];
         NSString *iconSelected = [item valueForKey:@"icon_selected"];
@@ -34,6 +32,7 @@
         nav.tabBarItem.image = [[UIImage imageNamed:icon] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
         nav.tabBarItem.selectedImage = [[UIImage imageNamed:iconSelected] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
         nav.tabBarItem.imageInsets = UIEdgeInsetsMake(8, 0, -8, 0);
+        nav.tabBarItem.title = title;
         if (title && title.length) {
             [vc setTitle:title];
         }
