@@ -7,6 +7,7 @@
 //
 
 #import "BaseTableViewController.h"
+#import "Global.h"
 
 @interface BaseTableViewController ()
 
@@ -39,8 +40,17 @@
 - (void)viewDidLoad{
     [super viewDidLoad];
     if (!self.tableView) {
-        self.tableView = /*AUTORELEASE*/([[TableView alloc] initWithFrame:_frame style:self.tableStyle]);
+        self.tableView = /*AUTORELEASE*/([[TableView alloc] initWithFrame:self.view.bounds style:self.tableStyle]);
         self.tableView.autoresizingMask |= UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        UIEdgeInsets contentOriginInset = UIEdgeInsetsZero;
+        if (!self.navigationController.navigationBar.isHidden) {
+            CGFloat statusBarHeight = [APP isStatusBarHidden]?0:[APP statusBarFrame].size.height;
+            contentOriginInset.top = self.navigationController.navigationBar.bounds.size.height + statusBarHeight;
+        }
+        if (self.tabBarController && !self.hidesBottomBarWhenPushed) {
+            contentOriginInset.bottom = self.tabBarController.tabBar.bounds.size.height;
+        }
+        _tableView.contentOriginInset = contentOriginInset;
         [_tableView setDelegate:self];
         [_tableView setDataSource:self];
         [self.view addSubview:_tableView];

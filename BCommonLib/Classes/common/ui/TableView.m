@@ -14,7 +14,6 @@
 
 @property (nonatomic, retain) DragView *updateView;
 @property (nonatomic, retain) DragView *moreView;
-@property (nonatomic, assign) UIEdgeInsets contentOriginInset;
 @end
 
 @implementation TableView
@@ -29,7 +28,7 @@
         _topLine.lineWidth = 0.5;
         _topLine.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         [_topLine setColors:[NSArray arrayWithObjects:gLineTopColor,gLineBottomColor,nil]];
-        self.contentOriginInset = UIEdgeInsetsZero;
+        self.contentOriginInset = UIEdgeInsetsMake(64, 0, 59, 0);
         //[self addSubview:_topLine];
     }
     self.backgroundColor = [UIColor clearColor];
@@ -187,6 +186,7 @@
 
 - (void)updateFinished{
     //[self.layer removeAllAnimations];
+    DLOG(@"%@",NSStringFromUIEdgeInsets(self.contentInset));
     [UIView animateWithDuration:0.5
                      animations:^{
                          //self.contentInset = UIEdgeInsetsZero;
@@ -205,10 +205,15 @@
             return;
         }
         [self.updateView setState:DragStateLoading];
-        self.contentOriginInset = self.contentInset;
+        //self.contentOriginInset = self.contentInset;
+        //self.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
+        __block UIEdgeInsets contentOriginInset = self.contentOriginInset;
+        if (UIEdgeInsetsEqualToEdgeInsets(self.contentInset, UIEdgeInsetsZero)) {
+            contentOriginInset = self.contentInset;
+        }
         [UIView animateWithDuration:0.3
                          animations:^{
-                             self.contentInset = UIEdgeInsetsMake([self.updateView activeHeight]+self.contentOriginInset.top-5, 0.0f, 00.0f, 0.0f);
+                             self.contentInset = UIEdgeInsetsMake([self.updateView activeHeight]+contentOriginInset.top-5, 0.0f, 00.0f, 0.0f);
                          }];
         if (self.delegate && [self.delegate respondsToSelector:@selector(update:)]) {
             [(id<XScrollViewDelegate>)self.delegate update:self];
@@ -222,19 +227,21 @@
             return;
         }
         [self.moreView setState:DragStateLoading];
-        self.contentOriginInset = self.contentInset;
+        //self.contentOriginInset = UIEdgeInsetsMake(64, 0, 60, 0);
+        //self.contentOriginInset = UIEdgeInsetsMake(64, 0, [self.moreView activeHeight]-5, 0);
         
-        self.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, [self.moreView activeHeight]+self.contentOriginInset.top - 5 , 0.0f);
-//        [self.layer removeAllAnimations];
-//        [UIView animateWithDuration:0.2
-//                         animations:^{
-//                         }];
+        [self.layer removeAllAnimations];
+        [UIView animateWithDuration:0.2
+                         animations:^{
+                             self.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, [self.moreView activeHeight]+self.contentOriginInset.top - 5 , 0.0f);
+                         }];
         if (self.delegate && [self.delegate respondsToSelector:@selector(loadMore:)]) {
             [(id<XScrollViewDelegate>)self.delegate loadMore:self];
         }
     }
 }
 - (void)setContentInset:(UIEdgeInsets)contentInset{
+    DLOG(@"%@",NSStringFromUIEdgeInsets(contentInset));
     [super setContentInset:contentInset];
     
     /*
@@ -255,18 +262,22 @@
     }
 }
 - (void) scrollViewDidScroll:(UIScrollView *)scrollView{
-    float oh = scrollView.contentOffset.y;
-	float oh2 = MAX(scrollView.contentSize.height,scrollView.bounds.size.height) - scrollView.bounds.size.height;
-    if (self.supportUpdate && scrollView.dragging && oh < 0 && self.updateView.state != DragStateLoading) {
-		if ( oh < -[self.updateView activeHeight]) {
+    float oy = scrollView.contentOffset.y;
+	float oy2 = MAX(scrollView.contentSize.height,scrollView.bounds.size.height) - scrollView.bounds.size.height;
+    if (self.supportUpdate && scrollView.dragging && oy < 0 && self.updateView.state != DragStateLoading) {
+        float updateOffsetY = [self.updateView activeHeight]+self.contentOriginInset.top;
+		if ( oy < - updateOffsetY) {
 			self.updateView.state = DragStateDragBeyond;
 		}else{
 			self.updateView.state = DragStateDraging;
 		}
         //DLOG(@"scrollViewDidScroll:%d",self.updateView.state);
 	}
-    if (self.isSupportLoadMore && scrollView.dragging && oh > oh2 && self.moreView.state != DragStateLoading){
-        if ( (oh-oh2) >  [self.moreView activeHeight]) {
+    if (self.isSupportLoadMore && scrollView.dragging && oy > oy2 && self.moreView.state != DragStateLoading){
+        
+        float loadMoreOffsetY = oy2+self.contentOriginInset.top+self.contentOriginInset.bottom;
+        
+        if ( oy>loadMoreOffsetY) {
 			self.moreView.state = DragStateDragBeyond;
         }else{
 			self.moreView.state = DragStateDraging;
@@ -274,10 +285,14 @@
     }
 }
 - (void) scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate{
-	if ([self isSupportUpdate] && scrollView.contentOffset.y < -[self.updateView activeHeight] && self.updateView.state != DragStateLoading) {
+    float oy = scrollView.contentOffset.y;
+    float updateOffsetY = [self.updateView activeHeight]+self.contentOriginInset.top;
+    
+	if ([self isSupportUpdate] && oy < -updateOffsetY && self.updateView.state != DragStateLoading) {
 		[self startUpdate];
-	}
-    if ([self isSupportLoadMore]  && (MAX(scrollView.contentSize.height,scrollView.bounds.size.height) - scrollView.bounds.size.height) <   scrollView.contentOffset.y && self.moreView.state != DragStateLoading){
+    }
+    float loadMoreOffsetY = MAX(scrollView.contentSize.height,scrollView.bounds.size.height) - scrollView.bounds.size.height+self.contentOriginInset.top+self.contentOriginInset.bottom;
+    if ([self isSupportLoadMore]  && oy> loadMoreOffsetY && self.moreView.state != DragStateLoading){
         [self startLoadMore];
     }
 }
@@ -292,12 +307,6 @@
 	if (_queue && [_queue operationCount]>0) {
 		[_queue cancelAllOperations];
 	}
-	////
-	////
-	////
-    ////
-    ////
-    //[super dealloc];
 }
 @end
 

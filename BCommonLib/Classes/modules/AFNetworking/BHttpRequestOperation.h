@@ -10,7 +10,7 @@
 #import "AFNetworking.h"
 #import "BHttpRequestCacheHandler.h"
 
-@interface BHttpRequestOperation /*: AFHTTPRequestOperation*/
+@interface BHttpRequestOperation:NSObject /*: AFHTTPRequestOperation*/
 @property (nonatomic, retain) NSString *cacheFilePath;
 @property (nonatomic, retain) BHttpRequestCacheHandler *cacheHandler;
 @property (nonatomic, retain) NSDictionary *userInfo;

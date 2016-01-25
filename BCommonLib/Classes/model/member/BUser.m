@@ -14,6 +14,9 @@
 static id _current_user = nil;
 
 @implementation BUser
++ (BOOL)automaticallyNotifiesObserversForKey:(NSString *)theKey {
+    return YES;
+}
 - (id)initWithDictionary:(NSDictionary *)dict{
     if ( self = [super initWithDictionary:dict] ) {
         if (!self.desc) {
@@ -30,6 +33,15 @@ static id _current_user = nil;
         return self.name;
     }
     return _displayName;
+}
+- (void)setValue:(id)value forKey:(NSString *)key{
+    [super setValue:value forKey:key];
+}
+- (void)setValue:(id)value forKeyPath:(NSString *)keyPath{
+    [self setValue:value forKeyPath:keyPath];
+}
+- (void)setValue:(id)value forUndefinedKey:(NSString *)key{
+    [super setValue:value forUndefinedKey:key];
 }
 + (BOOL)isLogin{
     return USER?YES:NO;
@@ -91,7 +103,7 @@ static id _current_user = nil;
 + (id)loginWithUserName:(NSString *)uname password:(NSString *)pwd success:(void (^)(BUser *, NSError *))success failure:(void (^)(NSError *))failure{
     
     NSDictionary *params = @{@"username":uname,@"password":pwd};
-    [[BHttpRequestManager defaultManager]
+    return [[BHttpRequestManager defaultManager]
      getJson:ApiLogin
      parameters:params
      success:^(id  _Nonnull task, id  _Nullable json) {

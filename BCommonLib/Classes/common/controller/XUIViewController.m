@@ -138,7 +138,7 @@
        // _frame.size.height -= self.navigationController.navigationBar.bounds.size.height;
     }
 	if (self.tabBarController && !self.hidesBottomBarWhenPushed) {
-		_frame.size.height -= self.tabBarController.tabBar.frame.size.height;
+		//_frame.size.height -= self.tabBarController.tabBar.frame.size.height;
 	}
 }
 - (void)didReceiveMemoryWarning{

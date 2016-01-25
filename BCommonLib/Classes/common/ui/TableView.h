@@ -76,6 +76,7 @@ typedef NSInteger SeparatorLineStyle;
 @property (nonatomic, retain) BLineView *topLine;
 @property (nonatomic, assign) BOOL useCache;
 @property (nonatomic, retain) NSMutableDictionary *imgCache;
+@property (nonatomic, assign) UIEdgeInsets contentOriginInset;
 
 @property (nonatomic, assign, getter = isSupportLoadMore) BOOL supportLoadMore;
 @property (nonatomic, assign, getter = isSupportUpdate) BOOL supportUpdate;

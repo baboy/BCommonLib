@@ -5,6 +5,7 @@
 //  Created by baboy on 1/18/16.
 //
 //
+#import <Foundation/Foundation.h>
 
 
 @interface BHttpRequestTask: NSObject
