@@ -997,7 +997,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FDFF22E1F3822F0EBB1E479A /* Pods.debug.xcconfig */;
 			buildSettings = {
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
@@ -1007,7 +1007,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4715C2F6EAF7E76C02749CD1 /* Pods.release.xcconfig */;
 			buildSettings = {
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
