@@ -66,11 +66,26 @@
 	if ([v length] > 0) {
 		NSArray *arr = [v split:@","];
 		NSInteger n = [arr count];
-		float fsize;
-		int b;
-		fsize = n>0?[[arr objectAtIndex:0] floatValue]:14;
-		b = n>1?[[arr objectAtIndex:1] intValue]:0;
-		UIFont *font =  b>0 ?[UIFont boldSystemFontOfSize:fsize]:[UIFont systemFontOfSize:fsize];
+        NSString *family = nil;
+        float fsize=14;
+        UIFont *font =  nil;
+        int b=0;
+        int i = 0;
+        if (![arr[i] isDigital]) {
+            family = arr[i++];
+        }
+        if (n>i) {
+            fsize = [arr[i++] floatValue];
+        }
+        if (n>i) {
+            b = [arr[i] intValue];
+        }
+        if (family) {
+            font = [UIFont fontWithName:family size:fsize];
+        }
+        if (!font) {
+            font =  b>0?[UIFont boldSystemFontOfSize:fsize]:[UIFont systemFontOfSize:fsize];
+        }
 		return font;
 	}
 	return [UIFont systemFontOfSize:14];

@@ -28,6 +28,7 @@
 - (NSString *)shortPinyin;
 - (BOOL)isEmail;
 - (BOOL)testRegex:(NSString *)re;
+- (BOOL)isDigital;
 
 /******* file operation*******/
 - (NSError *)removeFile;

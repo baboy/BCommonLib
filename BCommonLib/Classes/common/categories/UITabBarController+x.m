@@ -8,8 +8,22 @@
 
 #import "UITabBarController+x.h"
 #import "Utils.h"
+#import "Theme.h"
 
 @implementation UITabBarController(x)
+- (void)viewDidLoad{
+    [super viewDidLoad];
+    [[UITabBarItem appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                       [Theme colorForKey:@"tabbar_item_title_selected_color"], NSForegroundColorAttributeName,
+                                                       [Theme fontForKey:@"tabbar_item_title_selected_font"],NSFontAttributeName,
+                                                       
+                                                       nil] forState:UIControlStateSelected];
+    [[UITabBarItem appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                       [Theme colorForKey:@"tabbar_item_title_color"], NSForegroundColorAttributeName,
+                                                       [Theme fontForKey:@"tabbar_item_title_font"],NSFontAttributeName,
+                                                       
+                                                       nil] forState:UIControlStateNormal];
+}
 - (NSArray *) loadViewControllersFromFile:(NSString *)plist{
     NSArray *menus = [NSArray arrayWithContentsOfFile:getBundleFile(plist)];
     NSMutableArray *vcs = [NSMutableArray array];
@@ -31,7 +45,7 @@
         UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
         nav.tabBarItem.image = [[UIImage imageNamed:icon] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
         nav.tabBarItem.selectedImage = [[UIImage imageNamed:iconSelected] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
-        nav.tabBarItem.imageInsets = UIEdgeInsetsMake(8, 0, -8, 0);
+        //nav.tabBarItem.imageInsets = UIEdgeInsetsMake(8, 0, -8, 0);
         nav.tabBarItem.title = title;
         if (title && title.length) {
             [vc setTitle:title];

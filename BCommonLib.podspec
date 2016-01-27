@@ -1,10 +1,10 @@
 Pod::Spec.new do |s|
   s.name         = "BCommonLib"
-  s.version      = "0.15"
+  s.version      = "0.16"
   s.summary      = "for baboy use."
   s.homepage     = "http://github.com/baboy/BCommonLib"
   s.author       = { "baboy" => "baboyzyh@gmail.com" }
-  s.source       = { :git => "https://github.com/baboy/BCommonLib.git", :tag => "0.15" }
+  s.source       = { :git => "https://github.com/baboy/BCommonLib.git", :tag => "0.16" }
   s.platform     = :ios
   s.requires_arc = true
   s.ios.deployment_target = '7.0'

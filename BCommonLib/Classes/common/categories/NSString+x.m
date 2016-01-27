@@ -88,6 +88,10 @@
 - (BOOL)testRegex:(NSString *)re{
     return [self isMatchedByRegex:re];
 }
+- (BOOL)isDigital{
+    
+    return [self isMatchedByRegex:@"^[0-9]+$"];
+}
 #pragma file operation
 - (BOOL)copyFileTo:(NSString *)newPath{
 	NSFileManager *fileManager = [NSFileManager defaultManager];
