@@ -11,40 +11,12 @@
 #import "BCommonLibContext.h"
 #import "BCommonLibUI.h"
 #import "BCommonLibCategories.h"
+#import "UINavigationController+x.h"
 
 @implementation UINavigationController(x)
-- (void)setNavigationBarBackgroundImage:(UIImage *)backgroundImage{
-    if ([self.navigationBar respondsToSelector:@selector(setBackgroundImage:forBarPosition:barMetrics:)]) {
-        
-        backgroundImage = [backgroundImage resizableImageWithCapInsets:UIEdgeInsetsMake(backgroundImage.size.height/2, backgroundImage.size.width/2, backgroundImage.size.height/2, backgroundImage.size.width/2)];
-        [self.navigationBar setBackgroundImage:backgroundImage forBarPosition:UIBarPositionTopAttached barMetrics:UIBarMetricsDefault];
-    }
-    else if ([self.navigationBar respondsToSelector:@selector(setBackgroundImage:forBarMetrics:)]) {
-        UIImage *navigationBarBackground = backgroundImage;
-        if (navigationBarBackground)
-            [self.navigationBar setBackgroundImage:navigationBarBackground forBarMetrics:UIBarMetricsDefault];
-    }
-    self.navigationBar.titleTextAttributes = [NSDictionary dictionaryWithObject:gNavBarTitleColor forKey:UITextAttributeTextColor];
-}
-
-@end
-@implementation UIViewController (itv)
-
 @end
 
 @implementation XUINavigationController
-- (void)setNavigationBarBackgroundImage:(UIImage *)backgroundImage{
-    if ([self.navigationBar respondsToSelector:@selector(setBackgroundImage:forBarPosition:barMetrics:)]) {
-        
-        backgroundImage = [backgroundImage resizableImageWithCapInsets:UIEdgeInsetsMake(backgroundImage.size.height/2, backgroundImage.size.width/2, backgroundImage.size.height/2, backgroundImage.size.width/2)];
-        [self.navigationBar setBackgroundImage:backgroundImage forBarPosition:UIBarPositionTopAttached barMetrics:UIBarMetricsDefault];
-    }
-    else if ([self.navigationBar respondsToSelector:@selector(setBackgroundImage:forBarMetrics:)]) {
-        UIImage *navigationBarBackground = backgroundImage;
-        if (navigationBarBackground)
-            [self.navigationBar setBackgroundImage:navigationBarBackground forBarMetrics:UIBarMetricsDefault];
-    }
-}
 - (id) initWithRootViewController:(UIViewController *)rootViewController{
     if (self = [super initWithRootViewController:rootViewController]) {
         [self setNavigationBarBackgroundImage:gNavBarBackgroundImage];
@@ -296,64 +268,6 @@
     //}
     [self.requestPool setValue:request forKey:key];    
 }
-- (UIAlertView*)alert:(NSString *)msg button:(NSString *)buttonTitle,...{
-    
-    NSMutableArray *buttons = [NSMutableArray arrayWithCapacity:2];
-    va_list args;
-    va_start(args, buttonTitle);
-    id arg;
-    if (buttonTitle) {
-        [buttons addObject:buttonTitle];
-        while ( (arg = va_arg(args, NSString*) ) != nil) {
-            [buttons addObject:arg];
-        }
-    }
-    va_end(args);
-    return [self alertWithTitle:nil message:msg button:buttons,nil];
-}
-- (UIAlertView*)alertWithTitle:(NSString *)title message:(NSString *)msg button:(id)buttonTitle,...{
-    if (!msg) {
-        return nil;
-    }
-    NSMutableArray *buttons = nil;
-    if ([buttonTitle isKindOfClass:[NSArray class]]) {
-        buttons = buttonTitle;
-    }else{
-        buttons = [NSMutableArray arrayWithCapacity:2];
-        va_list args;
-        va_start(args, buttonTitle);
-        id arg;
-        if (buttonTitle) {
-            [buttons addObject:buttonTitle];
-            while ( (arg = va_arg(args, NSString*) ) != nil) {
-                [buttons addObject:arg];
-            }
-        }
-        va_end(args);
-    }
-    if ([buttons count] == 0) {
-        buttons = [NSMutableArray arrayWithObject:NSLocalizedString(@"确定", @"alert")];
-    }
-    
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"", nil)
-                                                     message:msg
-                                                    delegate:self
-                                           cancelButtonTitle:nil
-                                           otherButtonTitles:nil];
-    NSInteger n = [buttons count];
-    for (int i=0; i<n; i++) {
-        [alert addButtonWithTitle:[buttons objectAtIndex:i]];
-    }
-    [alert show];
-    return alert;
-}
-- (UIAlertView*)alert:(NSString *)msg{
-    UIAlertView *alert = [self alert:msg button:NSLocalizedString(@"确定", @"alert")];
-    [alert setTag:AlertViewTagAlert];
-    [alert show];
-    return alert;
-}
-
 - (BDropMenu*) topDropMenu{
     if (!_topDropMenu) {
         _topDropMenu = [[BDropMenu alloc] init];

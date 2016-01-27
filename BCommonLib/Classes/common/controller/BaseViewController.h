@@ -14,10 +14,6 @@
 */
 @interface BaseViewController : XUIViewController
 @property (nonatomic, assign) BOOL canPullBack;
-- (NSArray *)getInputCheckConfig;
-- (BOOL)checkInput;
-- (BOOL)checkInput:(NSArray *)config;
-+ (void)showNetConnectMessage;
 
 - (void)commentApp;
 - (void)checkAppViersion;

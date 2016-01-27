@@ -9,17 +9,6 @@
 #import <UIKit/UIKit.h>
 #import "BDropMenu.h"
 #import "BDropTitleView.h"
-
-enum{
-    AlertViewTagAlert,
-    AlertViewTagError,
-};
-@interface UINavigationController(x)
-- (void)setNavigationBarBackgroundImage:(UIImage *)backgroundImage;
-@end
-@interface UIViewController (itv)
-
-@end
 @interface XUINavigationController:UINavigationController
 - (void)setNavBgColor:(UIColor *)color;
 @end
@@ -45,7 +34,4 @@ enum{
 - (void)fadeOut;
 - (void)fadeOutAfterDelay:(float)t;
 - (void)setHttpRequest:(id)request forKey:(NSString *)key;
-- (UIAlertView*)alert:(NSString *)msg;
-- (UIAlertView*)alert:(NSString *)msg button:(NSString *)buttonTitle,...;
-- (UIAlertView*)alertWithTitle:(NSString *)title message:(NSString *)msg button:(id)buttonTitle,...;
 @end
