@@ -18,7 +18,7 @@ NSString *HttpRequestDomain = @"X-Channel request error";
 -  (id) initWithDictionary:(NSDictionary *)dict dataItemClass:(Class)itemClass{
     [self setDataItemClass:NSStringFromClass(itemClass)];
     if ([super initWithDictionary:dict]) {
-        if (![self.data isKindOfClass:[NSArray class]] && itemClass) {
+        if ([self.data isKindOfClass:[NSDictionary class]] && itemClass && [itemClass isSubclassOfClass:[Model class]]) {
             self.data = [[itemClass alloc] initWithDictionary:self.data];
         }
     }
