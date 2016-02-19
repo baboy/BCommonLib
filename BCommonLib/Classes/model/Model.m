@@ -158,7 +158,7 @@
                     continue;
                 }
                 if ([className isEqualToString:@"float"]) {
-                    int v = [val floatValue];
+                    float v = [val floatValue];
                     // set value
                     IMP imp = [self methodForSelector:sel];
                     void(*func)(id, SEL, float) = (void *)imp;
@@ -166,7 +166,7 @@
                     continue;
                 }
                 if ([className isEqualToString:@"double"]) {
-                    int v = [val doubleValue];
+                    double v = [val doubleValue];
                     // set value
                     IMP imp = [self methodForSelector:sel];
                     void(*func)(id, SEL, double) = (void *)imp;
@@ -174,7 +174,7 @@
                     continue;
                 }
                 if ([className isEqualToString:@"long"]) {
-                    int v = [val doubleValue];
+                    long long v = [val longLongValue];
                     // set value
                     IMP imp = [self methodForSelector:sel];
                     void(*func)(id, SEL, long long) = (void *)imp;
@@ -183,7 +183,7 @@
                 }
                 
                 if ([className isEqualToString:@"boolean"]) {
-                    int v = [val boolValue];
+                    BOOL v = [val boolValue];
                     // set value
                     IMP imp = [self methodForSelector:sel];
                     void(*func)(id, SEL, BOOL) = (void *)imp;

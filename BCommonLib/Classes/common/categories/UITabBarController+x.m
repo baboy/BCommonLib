@@ -9,6 +9,7 @@
 #import "UITabBarController+x.h"
 #import "Utils.h"
 #import "Theme.h"
+#import "XUIViewController.h"
 
 @implementation UITabBarController(x)
 - (void)viewDidLoad{
@@ -42,7 +43,7 @@
         if(!c)
             continue;
         UIViewController *vc = [[c alloc] init];
-        UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+        XUINavigationController *nav = [[XUINavigationController alloc] initWithRootViewController:vc];
         nav.tabBarItem.image = [[UIImage imageNamed:icon] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
         nav.tabBarItem.selectedImage = [[UIImage imageNamed:iconSelected] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
         //nav.tabBarItem.imageInsets = UIEdgeInsetsMake(8, 0, -8, 0);
