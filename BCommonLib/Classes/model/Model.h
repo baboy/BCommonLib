@@ -11,6 +11,7 @@
 @interface Model : NSObject
 //@property (nonatomic, strong) id object;
 - (id) initWithDictionary:(NSDictionary *)dict;
+- (NSDictionary *)fieldMap;
 - (void)build:(NSDictionary *)data;
 - (void)setValuesWithDictionary:(NSDictionary*)dict forKeys:(NSArray *)keys;
 - (NSMutableDictionary *)dictForFields:(NSArray *)fields;

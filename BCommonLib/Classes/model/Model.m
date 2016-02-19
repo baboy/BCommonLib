@@ -21,6 +21,9 @@
     }
     return self;
 }
+- (NSDictionary *)fieldMap{
+    return nil;
+}
 - (NSString *)getterName:(NSString *)field{
     BOOL needTrans = [field rangeOfString:@"_"].length > 0;
     if(needTrans){
@@ -33,6 +36,10 @@
         if ([[field lowercaseString] isEqualToString:[i lowercaseString]]) {
             return i;
         }
+    }
+    NSDictionary *fMap = [self fieldMap];
+    if (fMap && [fMap valueForKey:field]) {
+        return [fMap valueForKey:field];
     }
     return field;
 }
