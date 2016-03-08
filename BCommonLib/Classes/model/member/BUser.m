@@ -73,20 +73,23 @@ static id _current_user = nil;
     }
 }
 + (BOOL)loginWithUser:(BUser *)user{
-    if (user) {
-        if ([self loginUser]) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:NotificationUserWillChange object:nil];
-        }
-        NSString *data = [[user dict] jsonString];
-        //DLOG(@"%@", data);
-        if (data) {
-            [DBCache setValue:data forKey:@"USER"];
-            [DBCache setValue:NSStringFromClass([user class]) forKey:@"USER_CLASS"];
-            ////
-            [[NSNotificationCenter defaultCenter] postNotificationName:NotifyLogin object:nil];
-            return YES;
-        }else{
-            DLOG(@"error");
+    @synchronized(self){
+        if (user) {
+            if ([self loginUser] && user) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:NotificationUserWillChange object:nil];
+            }
+            NSString *data = [[user dict] jsonString];
+            //DLOG(@"%@", data);
+            if (data) {
+                _current_user = user;
+                [DBCache setValue:data forKey:@"USER"];
+                [DBCache setValue:NSStringFromClass([user class]) forKey:@"USER_CLASS"];
+                ////
+                [[NSNotificationCenter defaultCenter] postNotificationName:NotifyLogin object:nil];
+                return YES;
+            }else{
+                DLOG(@"error");
+            }
         }
     }
     return NO;

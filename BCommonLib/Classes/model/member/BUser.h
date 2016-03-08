@@ -30,7 +30,7 @@
 @property (nonatomic, strong) NSString *desc;
 @property (nonatomic, strong) NSString *avatar;
 @property (nonatomic, strong) NSString *avatarThumbnail;
-@property (nonatomic, assign) NSInteger gender;
+@property (nonatomic, strong) NSString *gender;
 @property (nonatomic, strong) NSString *education;
 @property (nonatomic, strong) NSString *school;
 @property (nonatomic, strong) NSString *mobile;

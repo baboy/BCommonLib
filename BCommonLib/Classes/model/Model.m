@@ -198,7 +198,13 @@
                     continue;
                 }
                 id v = val;
-                if ([val isKindOfClass:[NSArray class]]) {
+                if ([className isEqualToString:@"NSString"]) {
+                    if ([val isKindOfClass:[NSArray class]] || [val isKindOfClass:[NSDictionary class]]) {
+                        v = [val jsonString];
+                    }else{
+                        v = [val description];
+                    }
+                }else if ([val isKindOfClass:[NSArray class]]) {
                     
                     className = [attributes valueForKey:[NSString stringWithFormat:@"%@Item",field]];
                     if (!className) {

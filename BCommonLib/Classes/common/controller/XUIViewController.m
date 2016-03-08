@@ -13,9 +13,6 @@
 #import "BCommonLibCategories.h"
 #import "UINavigationController+x.h"
 
-@implementation UINavigationController(x)
-@end
-
 @implementation XUINavigationController
 - (id) initWithRootViewController:(UIViewController *)rootViewController{
     if (self = [super initWithRootViewController:rootViewController]) {
@@ -46,7 +43,9 @@
     if ([[self viewControllers] count] <= 1) {
         return;
     }
-    viewController.navigationItem.leftBarButtonItem = [Theme navBarButtonForKey:@"navigationbar-back-button" withTarget:viewController action:@selector(popViewController:)];
+    if ([viewController isKindOfClass:[XUIViewController class]]) {
+        viewController.navigationItem.leftBarButtonItem = [Theme navBarButtonForKey:@"navigationbar-back-button" withTarget:viewController action:@selector(popViewController:)];
+    }
 }
 - (BOOL)shouldAutorotate{
     UIViewController *vc = self.topViewController;
@@ -55,7 +54,7 @@
     }
     return NO;
 }
--(NSUInteger)supportedInterfaceOrientations{
+-(UIInterfaceOrientationMask)supportedInterfaceOrientations{
     UIViewController *vc = self.topViewController;
     if ([vc respondsToSelector:@selector(supportedInterfaceOrientations)]) {
         return [vc supportedInterfaceOrientations];
@@ -147,7 +146,7 @@
     CGRect imgFrame = CGRectMake(0, titleView.bounds.size.height/2-iconWidth/2, iconWidth, iconWidth);
     XUIImageView *thumbImageView = [[XUIImageView alloc] initWithFrame:imgFrame];
     thumbImageView.contentMode = UIViewContentModeScaleAspectFit;
-    [thumbImageView setImageURLString:imageURL];
+    [thumbImageView setImageURLString:[imageURL absoluteString]];
     
     [titleView addSubview:thumbImageView];
     thumbImageView = nil;
@@ -190,16 +189,6 @@
         [self.navigationItem setTitleView:titleLabel];
         [self setTitleLabel:titleLabel];
     }
-    UIViewController *rootController = self.view.window.rootViewController;
-    if (rootController.modalViewController) {
-        rootController = rootController.modalViewController;
-    }
-    if ([rootController isKindOfClass:[UINavigationController class]]) {
-        //rootController = [(UINavigationController*)rootController viewControllers];
-    }
-    if (!self.navigationController) {
-        
-    }
 }
 - (void)addBackButton{
     if (!self.navigationItem) {
@@ -213,7 +202,8 @@
     [self.navigationItem setLeftBarButtonItem:backButton animated:YES];
 }
 - (void)goBack:(id)sender{
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES
+                             completion:nil];
 }
 - (void)viewDidUnload{
     [super viewDidUnload];
