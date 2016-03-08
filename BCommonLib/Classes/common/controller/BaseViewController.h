@@ -17,5 +17,6 @@
 
 - (void)commentApp;
 - (void)checkAppViersion;
+- (NSInteger)currentAppUpdateRole:(id)app;
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex;
 @end

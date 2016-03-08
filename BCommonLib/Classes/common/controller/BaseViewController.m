@@ -31,7 +31,7 @@
         self.app = app;
         NSString *msg = app.msg;
         NSMutableArray *btnTitles = [NSMutableArray array];
-        switch (app.role) {
+        switch ([self currentAppUpdateRole:app]) {
             case AppUpdateRoleMsg:
                 [btnTitles addObject:NSLocalizedString(@"确定", nil)];
                 break;
@@ -84,19 +84,26 @@
         alert.tag = AlertViewCommentApp;
     }
 }
+- (NSInteger)currentAppUpdateRole:(ApplicationVersion*)app{
+    if ([app.role intValue]>0) {
+        return [self.app.role intValue];
+    }
+    return AppUpdateRoleNormal;
+}
 #pragma  alert delegate
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
     switch (alertView.tag){
-        case AlertViewTagCheckVersion:
-            switch (self.app.role) {
+        case AlertViewTagCheckVersion:{
+            NSString *updateUrl = [self.app.appStore isURL]?self.app.appStore:self.app.downloadUrl;
+            switch ([self currentAppUpdateRole:self.app]) {
                 case AppUpdateRolePrompt:
-                    if (buttonIndex==1 && [self.app.appStore isURL]) {
-                        [APP openURL:[NSURL URLWithString:self.app.appStore]];
+                    if (buttonIndex==1 && [updateUrl isURL]) {
+                        [APP openURL:[NSURL URLWithString:updateUrl]];
                     }
                     break;
                 case AppUpdateRoleUpdate:
-                    if ([self.app.appStore isURL]) {
-                        [APP openURL:[NSURL URLWithString:self.app.appStore]];
+                    if ([updateUrl isURL]) {
+                        [APP openURL:[NSURL URLWithString:updateUrl]];
                     }
                     break;
                 case AppUpdateRoleForbidden:
@@ -106,6 +113,7 @@
                 default:
                     break;
             }
+        }
         case AlertViewCommentApp:
             //[BehaviorTracker trackEvent:@"comment_app" group:@"app" element:[NSString stringWithFormat:@"%ld", (long)buttonIndex]];
             if (buttonIndex == AlertViewCommentAppGoodIndex) {

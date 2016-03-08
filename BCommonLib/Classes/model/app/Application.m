@@ -140,22 +140,6 @@
 @end
 
 @implementation ApplicationVersion
-- (id)initWithDictionary:(NSDictionary *)dict{
-    
-    if (self = [super init]) {
-        self.role = [nullToNil([dict objectForKey:@"role"]) intValue];
-        self.version = nullToNil([[dict objectForKey:@"version"] description]);
-        self.appStore = nullToNil([dict objectForKey:@"appStore"]);
-        if (!isURL(self.appStore)) {
-            self.appStore = nullToNil([dict objectForKey:@"download_url"]);
-        }
-        if (!isURL(self.appStore)) {
-            self.appStore = nullToNil([dict objectForKey:@"link"]);
-        }
-        self.msg = nullToNil([dict objectForKey:@"msg"]);
-    }
-    return self;
-}
 #pragma mark -- 检测版本
 + (id )getAppVersionSuccess:(void(^)(id task, ApplicationVersion* app))success failure:(void(^)(id task, ApplicationVersion* app,NSError *error))failure{
     
@@ -168,13 +152,11 @@
          DLOG(@"json = %@",json);
          NSError *error = nil;
          ApplicationVersion *app = nil;
-         int role = 0;
          HttpResponse *respone = [HttpResponse responseWithDictionary:json];
          if ([respone isSuccess]) {
              app = [[ApplicationVersion alloc] initWithDictionary:respone.data];
          }else {
              error = respone.error;
-             role = [[respone.data valueForKey:@"role"] intValue];
          }
          
          if (success) {

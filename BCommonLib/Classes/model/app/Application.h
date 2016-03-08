@@ -17,7 +17,7 @@ enum {
 };
 typedef NSInteger AppUpdateRole;
 
-@interface Application : NSObject
+@interface Application : Model
 
 @property (nonatomic, retain) NSString *appName;
 @property (nonatomic, retain) NSString *appSummary;
@@ -41,13 +41,13 @@ typedef NSInteger AppUpdateRole;
 + (id )feedback:(NSString *)content success:(void (^)(id task,id response))success failure:(void (^)(id task, NSError *error))failure ;
 @end
 
-@interface ApplicationVersion : NSObject
-@property (nonatomic, assign) int role;
+@interface ApplicationVersion : Model
+@property (nonatomic, strong) NSString *role;
 @property (nonatomic, strong) NSString *appStore;
+@property (nonatomic, strong) NSString *downloadUrl;
 @property (nonatomic, strong) NSString *msg;
 @property (nonatomic, strong) NSString *version;
-- (id)initWithDictionary:(NSDictionary *)dict;
-
+@property (nonatomic, strong) NSString *build;
 //检测版本更新
 + (id )getAppVersionSuccess:(void(^)(id task, ApplicationVersion* app))success failure:(void(^)(id task, ApplicationVersion* app,NSError *error))failure;
 
