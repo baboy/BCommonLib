@@ -35,6 +35,7 @@
 - (BOOL)copyFileTo:(NSString *)newPath;
 - (BOOL)deleteFile;
 - (long long)sizeOfFile;
+- (NSData *)fileData;
 - (BOOL)fileExists;
 - (BOOL)renameFileTo:(NSString *)to;
 

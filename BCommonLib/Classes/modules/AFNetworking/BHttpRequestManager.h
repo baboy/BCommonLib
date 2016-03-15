@@ -11,6 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 @interface BHttpRequestManager :AFHTTPSessionManager /*: AFHTTPRequestOperationManager*/
+@property (nonatomic, strong) NSArray *cacheRequestIgnoreParams;
 
 + (_Nonnull id)defaultManager;
 

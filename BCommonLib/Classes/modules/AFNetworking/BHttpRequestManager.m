@@ -12,6 +12,7 @@
 #import "Global.h"
 #import "NSURLSessionTask+x.h"
 #import "BHttpRequestQueue.h"
+#import "RegexKitLite.h"
 
 
 @interface BHttpRequestManager()
@@ -39,6 +40,20 @@
 - (BOOL)cancelTask:(BHttpRequestTask *_Nullable)task{
     [self.requestQueue cancelTask:task];
     return YES;
+}
+- (void)setCacheRequestIgnoreParams:(NSArray *)cacheRequestIgnoreParams{
+    _cacheRequestIgnoreParams = cacheRequestIgnoreParams;
+}
+- (NSString *)getRequestCachePath:(NSString *)url{
+    NSString *u = url;
+    for (NSString *field in self.cacheRequestIgnoreParams) {
+        NSString *f = [field stringByReplacingOccurrencesOfRegex:@"\\*" withString:@"[0-9a-zA-Z_-]+"];
+        NSString *re = [NSString stringWithFormat:@"(%@=[^=&]{0,}&?)",f];
+        NSArray *arr = [u arrayOfCaptureComponentsMatchedByRegex:re];
+        u = [u stringByReplacingOccurrencesOfRegex:re withString:@""];
+    }
+    NSString *fp = getCacheFilePath([NSURL URLWithString:u]);
+    return fp;
 }
 - (nullable id )getData:(nullable NSString *)URLString
              parameters:(nullable id)parameters
@@ -115,8 +130,7 @@
                              
                              if (cachePolicy & BHttpRequestCachePolicyCached) {
                                  if (json) {
-                                     
-                                     NSString *fp = getCacheFilePath([NSURL URLWithString:[URLString URLStringWithParam:parameters]]);
+                                     NSString *fp = [self getRequestCachePath:url];
                                      [[json jsonData] writeToFile:fp atomically:YES];
                                      //DLOG(@"%@%lld",fp,[fp sizeOfFile]);
                                  }
@@ -126,7 +140,8 @@
                          failure:^(NSURLSessionDataTask * _Nullable dataTask, NSError * _Nonnull error){
                              id json = nil;
                              if (cachePolicy & BHttpRequestCachePolicyFallbackToCacheIfLoadFails) {
-                                 NSData *data = getCacheFileData([NSURL URLWithString:[URLString URLStringWithParam:parameters]]);
+                                 NSString *fp = [self getRequestCachePath:url];
+                                 NSData *data = [fp fileData];
                                  if (data) {
                                      DLOG(@"read cache:%@",getCacheFilePath([NSURL URLWithString:[URLString URLStringWithParam:parameters]]));
                                      json = [data json];
@@ -187,7 +202,7 @@
             NSString *fp = getCacheFilePath([NSURL URLWithString:URLString]);
             if ([fp sizeOfFile]>0) {
                 success(nil,[NSURL fileURLWithPath:fp]);
-                DLOG(@"download,read from cache:%d,%@",[fp sizeOfFile],[fp lastPathComponent]);
+                DLOG(@"download,read from cache:%lld,%@",[fp sizeOfFile],[fp lastPathComponent]);
                 return nil;
             }
         }

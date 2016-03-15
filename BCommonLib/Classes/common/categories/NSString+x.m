@@ -119,7 +119,12 @@
     NSDictionary *attrs = [fileManager attributesOfItemAtPath:self error: NULL];
     return [attrs fileSize];
 }
-
+- (NSData *)fileData{
+    if ([[NSFileManager defaultManager] fileExistsAtPath:self]) {
+        return [NSData dataWithContentsOfFile:self];
+    }
+    return nil;
+}
 - (BOOL)fileExists{
     return [[NSFileManager defaultManager] fileExistsAtPath:self];
 }
