@@ -14,6 +14,7 @@
 @implementation UITabBarController(x)
 - (void)viewDidLoad{
     [super viewDidLoad];
+    self.view.backgroundColor = ThemeViewBackgroundColor;
     [[UITabBarItem appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
                                                        [Theme colorForKey:@"tabbar_item_title_selected_color"], NSForegroundColorAttributeName,
                                                        [Theme fontForKey:@"tabbar_item_title_selected_font"],NSFontAttributeName,
