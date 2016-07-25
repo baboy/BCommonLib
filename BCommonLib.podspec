@@ -6,9 +6,7 @@ Pod::Spec.new do |s|
   s.homepage     = 'http://github.com/baboy/BCommonLib'
   s.author       = { 'baboy' => 'baboyzyh@gmail.com' }
   s.source       = { :git => 'https://github.com/baboy/BCommonLib.git', :tag => '0.24' }
-  s.platform=:ios
   s.requires_arc = true
-  s.ios.deployment_target = '7.0'
 
   s.source_files = 'BCommonLib/Classes/*.{h,m}'
 
