@@ -2,6 +2,7 @@ Pod::Spec.new do |s|
   s.name         = "BCommonLib"
   s.version      = "0.24"
   s.summary      = "for baboy use."
+  s.license		 = { :type => 'BSD' }
   s.homepage     = "http://github.com/baboy/BCommonLib"
   s.author       = { "baboy" => "baboyzyh@gmail.com" }
   s.source       = { :git => "https://github.com/baboy/BCommonLib.git", :tag => "0.24" }
