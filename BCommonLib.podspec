@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  s.name='BCommonLib'
+  s.name='BCommon'
   s.version      = '0.24'
   s.summary      = 'for baboy use.'
   s.license      = { :type => 'BSD' }
