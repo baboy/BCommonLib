@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
 
   s.name         = "BCommonLib"
   s.version      = "0.25"
-  s.summary      = ""
+  s.summary      = "for baboy use."
 
   # This description is used to generate tags and improve search results.
   #   * Think: What does it do? Why did you write it? What is the focus?
@@ -25,6 +25,7 @@ Pod::Spec.new do |s|
   #   * Write the description between the DESC delimiters below.
   #   * Finally, don't worry about the indent, CocoaPods strips it!
   s.description  = <<-DESC
+                    nothing.
                    DESC
 
   s.homepage     = "https://github.com/baboy/BCommonLib"
@@ -38,7 +39,7 @@ Pod::Spec.new do |s|
   #  Popular ones are 'MIT', 'BSD' and 'Apache License, Version 2.0'.
   #
 
-  s.license      = "MIT (example)"
+  s.license      = "BSD"
   # s.license      = { :type => "MIT", :file => "FILE_LICENSE" }
 
 
